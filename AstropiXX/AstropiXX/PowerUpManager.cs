@@ -12,7 +12,7 @@ namespace AstropiXX
     {
         #region Members
 
-        private List<PowerUp> powerUps = new List<PowerUp>();
+        private List<PowerUp> powerUps = new List<PowerUp>(64);
         private Texture2D texture;
 
         private const int SPAWN_CHANCE = 15; // 15%

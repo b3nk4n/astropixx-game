@@ -58,7 +58,7 @@ namespace AstropiXX
         private float minGreenHornetShotTimer = 0.40f;
         private float minMediumDoubleShotTimer = 0.275f;
         private float minHardQuadShotTimer = 0.5f;
-        private float minTankCarliRocketTimer = 1.5f;
+        private float minTankCarliRocketTimer = 1.25f;
         private float minSpeederTrippleShotTimer = 0.40f;
         
         private const int PlayerRadius = 20;
@@ -108,12 +108,18 @@ namespace AstropiXX
 
         // gravity
         private Vector2 gravity;
-        public readonly Vector2 GRAVITY_GREENHORNET  = new Vector2(0, 900);
-        public readonly Vector2 GRAVITY_MEDIUM = new Vector2(0, 800);
-        public readonly Vector2 GRAVITY_HARD = new Vector2(0, 750);
+        //public readonly Vector2 GRAVITY_GREENHORNET  = new Vector2(0, 900);
+        //public readonly Vector2 GRAVITY_MEDIUM = new Vector2(0, 800);
+        //public readonly Vector2 GRAVITY_HARD = new Vector2(0, 750);
+        //public readonly Vector2 GRAVITY_TANK = new Vector2(0, 650);
+        //public readonly Vector2 GRAVITY_EASY = new Vector2(0, 1000);
+        //public readonly Vector2 GRAVITY_SPEEDER = new Vector2(0, 950);
+        public readonly Vector2 GRAVITY_GREENHORNET = new Vector2(0, 800);
+        public readonly Vector2 GRAVITY_MEDIUM = new Vector2(0, 750);
+        public readonly Vector2 GRAVITY_HARD = new Vector2(0, 700);
         public readonly Vector2 GRAVITY_TANK = new Vector2(0, 650);
-        public readonly Vector2 GRAVITY_EASY = new Vector2(0, 1000);
-        public readonly Vector2 GRAVITY_SPEEDER = new Vector2(0, 950);
+        public readonly Vector2 GRAVITY_EASY = new Vector2(0, 850);
+        public readonly Vector2 GRAVITY_SPEEDER = new Vector2(0, 900);
 
         public enum PlayerType { GreenHornet, Medium, Hard, Tank, Speeder, Easy };
         private PlayerType shipType = PlayerType.Easy;
@@ -156,14 +162,14 @@ namespace AstropiXX
             playerSprite.CollisionRadius = PlayerRadius;
 
             leftSideScreen = new Rectangle(0,
-                                           2 * screenBounds.Height / 3,
+                                          0,
                                            screenBounds.Width / 2,
-                                           screenBounds.Height / 3);
+                                           screenBounds.Height);
 
             rightSideScreen = new Rectangle(screenBounds.Width / 2,
-                                           2 * screenBounds.Height / 3,
+                                           0,
                                            screenBounds.Width / 2,
-                                           screenBounds.Height / 3);
+                                           screenBounds.Height);
 
             middleScreen = new Rectangle(0,
                                               screenBounds.Height / 3,
@@ -355,7 +361,7 @@ namespace AstropiXX
                 if (overheat < OVERHEAT_MAX)
                 {
                     this.PlayerShotManager.FireShot(this.playerSprite.Location + gunOffset,
-                                                    new Vector2(1, 0),
+                                                    Vector2.UnitX,
                                                     true,
                                                     new Color(1.0f, 1.0f, 0.1f),
                                                     true);
@@ -660,8 +666,7 @@ namespace AstropiXX
 
                 hasCollided = true;
             }
-
-            if (location.Y > (playerAreaLimit.Bottom - playerSprite.Source.Height / 2))
+            else if (location.Y > (playerAreaLimit.Bottom - playerSprite.Source.Height / 2))
             {
                 if (location.Y > playerAreaLimit.Bottom)
                 {
@@ -798,7 +803,7 @@ namespace AstropiXX
 
                 if (IsShieldActive)
                 {
-                    shieldSprite.TintColor = Color.Blue * (0.4f + 0.15f * shieldPoints / SHIELD_POINTS_MAX);
+                    shieldSprite.TintColor = Astropixx.ThemeColor * (0.4f + 0.15f * shieldPoints / SHIELD_POINTS_MAX);
                     shieldSprite.Location = playerSprite.Location - new Vector2(10, 10);
                     shieldSprite.Draw(spriteBatch);
                 }
@@ -880,11 +885,6 @@ namespace AstropiXX
         public void Activated(StreamReader reader)
         {
             //Player sprite
-            //this.playerSprite.Location = new Vector2(Single.Parse(reader.ReadLine()),
-            //                                         Single.Parse(reader.ReadLine()));
-            //this.playerSprite.Rotation = Single.Parse(reader.ReadLine());
-            //this.playerSprite.Velocity = new Vector2(Single.Parse(reader.ReadLine()),
-            //                                         Single.Parse(reader.ReadLine()));
             playerSprite.Activated(reader);
 
             this.distanceScore = Int64.Parse(reader.ReadLine());
@@ -1101,10 +1101,6 @@ namespace AstropiXX
                 return collectScore;
             }
         }
-
-        #endregion
-
-        #region Events
 
         #endregion
     }

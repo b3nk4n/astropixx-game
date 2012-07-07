@@ -12,7 +12,7 @@ namespace AstropiXX
     {
         #region Members
 
-        public List<Sprite> Shots = new List<Sprite>();
+        public List<Sprite> Shots = new List<Sprite>(256);
         
         private Rectangle screenBounds;
 
@@ -22,7 +22,7 @@ namespace AstropiXX
         private float shotSpeed;
         private static int CollisionRadius;
 
-        public List<Sprite> Rockets = new List<Sprite>();
+        public List<Sprite> Rockets = new List<Sprite>(32);
         private static Rectangle InitialRocketFrame;
         private static int RocketFrameCount = 5;
         private float rocketSpeed = 100.0f;
@@ -83,7 +83,7 @@ namespace AstropiXX
                 }
                 else
                 {
-                    SoundManager.PlayEnemyShot();
+                    //SoundManager.PlayEnemyShot();
                 }
             }
         }
@@ -122,7 +122,9 @@ namespace AstropiXX
                 if (playerFired)
                     SoundManager.PlayRocketSound();
                 else
-                    SoundManager.PlayEnemyRocketSound();
+                {
+                    //SoundManager.PlayEnemyRocketSound();
+                }
             }
         }
 

@@ -20,14 +20,15 @@ namespace AstropiXX
                                                                    300, 50);
         private readonly Vector2 TitlePosition = new Vector2(250.0f, 100.0f);
 
-        private readonly string[] Content = {"If you have any further questions,",
-                                            "ideas or problems with AstropiXX,",
-                                            "please do not hesitate to contact us."};
+        private static readonly string[] Content = {"If you have any further questions,",
+                                                    "ideas or problems with AstropiXX,",
+                                                    "please do not hesitate to contact us."};
 
-        private readonly string Email = "apps@bsautermeister.de";
-        private readonly string Blog = "bsautermeister.de/blog";
-        private readonly string MusicSponsor = "Music sponsor:";
-        private readonly string QBig = "soundcloud.com/qbig";
+        private const string Email = "apps@bsautermeister.de";
+        private const string EmailSubject = "AstropiXX - Support";
+        private const string Blog = "bsautermeister.de/blog";
+        private const string MusicSponsor = "Music sponsor:";
+        private const string QBig = "soundcloud.com/qbig";
 
         private readonly Rectangle screenBounds;
 
@@ -90,8 +91,8 @@ namespace AstropiXX
             if (GameInput.IsPressed(EmailAction))
             {
                 EmailComposeTask emailTask = new EmailComposeTask();
-                emailTask.To = "apps@bautermeister.de";
-                emailTask.Subject = "AstropiXX-Support";
+                emailTask.To = Email;
+                emailTask.Subject = EmailSubject;
                 emailTask.Show();
             }
             // Blog
@@ -132,32 +133,32 @@ namespace AstropiXX
                        Content[i],
                        new Vector2((screenBounds.Width - font.MeasureString(Content[i]).X) / 2,
                                    180 + (i * 35)),
-                       Color.Red * opacity);
+                       Astropixx.ThemeColor * opacity);
             }
 
             spriteBatch.DrawString(font,
                        Email,
                        new Vector2((screenBounds.Width - font.MeasureString(Email).X) / 2,
                                    300),
-                       Color.Red * opacity);
+                       Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(font,
                        Blog,
                        new Vector2((screenBounds.Width - font.MeasureString(Blog).X) / 2,
                                    350),
-                       Color.Red * opacity);
+                       Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(font,
                        MusicSponsor,
                        new Vector2((screenBounds.Width - font.MeasureString(MusicSponsor).X) / 2,
                                    395),
-                       Color.Red * opacity);
+                       Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(font,
                        QBig,
                        new Vector2((screenBounds.Width - font.MeasureString(QBig).X) / 2,
                                    430),
-                       Color.Red * opacity);
+                       Astropixx.ThemeColor * opacity);
         }
 
         #endregion

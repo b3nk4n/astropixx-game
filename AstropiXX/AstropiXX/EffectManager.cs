@@ -13,16 +13,19 @@ namespace AstropiXX
     {
         #region Members
 
-        public static List<Particle> ExplosionEffects = new List<Particle>();
-        public static List<Particle> PointEffects = new List<Particle>();
+        private const int PRELOADED_EXPLOSION_EFFECTS = 256;
+        private const int PRELOADED_POINT_EFFECTS = 1024;
+
+        public static List<Particle> ExplosionEffects = new List<Particle>(PRELOADED_EXPLOSION_EFFECTS);
+        public static List<Particle> PointEffects = new List<Particle>(PRELOADED_POINT_EFFECTS);
 
         private static Random rand = new Random();
         public static Texture2D Texture;
         public static Rectangle ParticleFrame = new Rectangle(0, 350, 2, 2);
-        public static List<Rectangle> ExplosionFrames = new List<Rectangle>();
+        public static List<Rectangle> ExplosionFrames = new List<Rectangle>(8);
 
-        private static Queue<Particle> freeExplosionParticles = new Queue<Particle>(128);
-        private static Queue<Particle> freePointParticles = new Queue<Particle>(1024);
+        private static Queue<Particle> freeExplosionParticles = new Queue<Particle>(PRELOADED_EXPLOSION_EFFECTS);
+        private static Queue<Particle> freePointParticles = new Queue<Particle>(PRELOADED_POINT_EFFECTS);
 
         #endregion
 
@@ -42,9 +45,18 @@ namespace AstropiXX
             }
 
             // Generate free explosion particles:
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < PRELOADED_EXPLOSION_EFFECTS; i++)
             {
-                ExplosionEffects.Add(new Particle(Vector2.Zero,
+                //ExplosionEffects.Add(new Particle(Vector2.Zero,
+                //                         Texture,
+                //                         ExplosionFrames[rand.Next(0, ExplosionFrames.Count - 1)],
+                //                         Vector2.Zero,
+                //                         Vector2.Zero,
+                //                         0.0f,
+                //                         0,
+                //                         Color.White,
+                //                         Color.White));
+                freeExplosionParticles.Enqueue(new Particle(Vector2.Zero,
                                          Texture,
                                          ExplosionFrames[rand.Next(0, ExplosionFrames.Count - 1)],
                                          Vector2.Zero,
@@ -56,9 +68,18 @@ namespace AstropiXX
             }
 
             // Generate free explosion particles:
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < PRELOADED_POINT_EFFECTS; i++)
             {
-                ExplosionEffects.Add(new Particle(Vector2.Zero,
+                //ExplosionEffects.Add(new Particle(Vector2.Zero,
+                //                         Texture,
+                //                         ParticleFrame,
+                //                         Vector2.Zero,
+                //                         Vector2.Zero,
+                //                         0.0f,
+                //                         0,
+                //                         Color.White,
+                //                         Color.White));
+                freePointParticles.Enqueue(new Particle(Vector2.Zero,
                                          Texture,
                                          ParticleFrame,
                                          Vector2.Zero,
@@ -74,11 +95,13 @@ namespace AstropiXX
         {
             Vector2 direction;
 
-            do
+            direction = new Vector2(rand.Next(0, 101) - 50,
+                                    rand.Next(0, 101) - 50);
+
+            if (direction.Length() == 0)
             {
-                direction = new Vector2(rand.Next(0, 101) - 50,
-                                        rand.Next(0, 101) - 50);
-            } while (direction.Length() == 0);
+                direction = -Vector2.UnitX;
+            }
 
             direction.Normalize();
             direction *= scale;
@@ -88,9 +111,6 @@ namespace AstropiXX
 
         public static void Update(GameTime gameTime)
         {
-            //if (freeExplosionParticles.Count > 0 || freePointParticles.Count > 0)
-            //    System.Diagnostics.Debug.WriteLine("freeExp: " + freeExplosionParticles.Count + "  |  FreePoints: " +freePointParticles.Count);
-
             // Explosion effects
             for (int x = ExplosionEffects.Count - 1; x >= 0; --x)
             {

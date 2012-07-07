@@ -63,8 +63,8 @@ namespace AstropiXX
         private Rectangle shieldDestination = new Rectangle(575, 45, 40, 20);
         private Rectangle overheatDestination = new Rectangle(575, 65, 40, 20);
 
-        private Color areaTint = Color.Red * 0.5f;
-        private Color arrowTint = Color.Red * 0.8f;
+        private Color areaTint = Astropixx.ThemeColor * 0.5f;
+        private Color arrowTint = Astropixx.ThemeColor * 0.8f;
 
         private AsteroidManager asteroidManager;
 
@@ -236,7 +236,7 @@ namespace AstropiXX
                 case InstructionStates.Welcome:
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, WelcomeText);
+                    drawBlueCenteredText(spriteBatch, WelcomeText);
                     break;
 
                 case InstructionStates.Movement:
@@ -264,13 +264,13 @@ namespace AstropiXX
                                          SpriteEffects.FlipHorizontally,
                                          0.0f);
                     }
-                    drawRedCenteredText(spriteBatch, MovementText);
+                    drawBlueCenteredText(spriteBatch, MovementText);
                     break;
 
                 case InstructionStates.LeaveField:
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, LeaveFieldText);
+                    drawBlueCenteredText(spriteBatch, LeaveFieldText);
                     break;
 
                 case InstructionStates.Shot:
@@ -298,13 +298,13 @@ namespace AstropiXX
                                          SpriteEffects.FlipHorizontally,
                                          0.0f);
                     }
-                    drawRedCenteredText(spriteBatch, ShotText);
+                    drawBlueCenteredText(spriteBatch, ShotText);
                     break;
 
                 case InstructionStates.ChangeControls:
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, ChangeControlsText);
+                    drawBlueCenteredText(spriteBatch, ChangeControlsText);
                     break;
 
                 case InstructionStates.HitPoints:
@@ -314,7 +314,7 @@ namespace AstropiXX
                                      hitPointsDestination,
                                      arrowRightSource,
                                      arrowTint);
-                    drawRedCenteredText(spriteBatch, HitPointsText);
+                    drawBlueCenteredText(spriteBatch, HitPointsText);
                     break;
 
                 case InstructionStates.Shield:
@@ -324,7 +324,7 @@ namespace AstropiXX
                                      shieldDestination,
                                      arrowRightSource,
                                      arrowTint);
-                    drawRedCenteredText(spriteBatch, ShieldText);
+                    drawBlueCenteredText(spriteBatch, ShieldText);
                     break;
 
                 case InstructionStates.Overheat:
@@ -334,20 +334,20 @@ namespace AstropiXX
                                      overheatDestination,
                                      arrowRightSource,
                                      arrowTint);
-                    drawRedCenteredText(spriteBatch, OverheatText);
+                    drawBlueCenteredText(spriteBatch, OverheatText);
                     break;
 
                 case InstructionStates.GameModes:
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, GameModesText);
+                    drawBlueCenteredText(spriteBatch, GameModesText);
                     break;
 
                 case InstructionStates.Survival:
                     asteroidManager.Draw(spriteBatch);
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, SurvivalText);
+                    drawBlueCenteredText(spriteBatch, SurvivalText);
                     break;
 
                 case InstructionStates.Destruction:
@@ -355,7 +355,7 @@ namespace AstropiXX
                     asteroidManager.Draw(spriteBatch);
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, DestructionText);
+                    drawBlueCenteredText(spriteBatch, DestructionText);
                     break;
 
                 case InstructionStates.Combo:
@@ -363,7 +363,7 @@ namespace AstropiXX
                     asteroidManager.Draw(spriteBatch);
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, ComboText1, ComboText2);
+                    drawBlueCenteredText(spriteBatch, ComboText1, ComboText2);
                     break;
 
                 case InstructionStates.PowerUps:
@@ -371,7 +371,7 @@ namespace AstropiXX
                     asteroidManager.Draw(spriteBatch);
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, PowerUpsText);
+                    drawBlueCenteredText(spriteBatch, PowerUpsText);
                     break;
 
                 case InstructionStates.GoodLuck:
@@ -379,40 +379,40 @@ namespace AstropiXX
                     asteroidManager.Draw(spriteBatch);
                     playerManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, GoodLuckText);
+                    drawBlueCenteredText(spriteBatch, GoodLuckText);
                     break;
 
                 case InstructionStates.ReturnWithBackButton:
                     powerUpManager.Draw(spriteBatch);
                     asteroidManager.Draw(spriteBatch);
 
-                    drawRedCenteredText(spriteBatch, ReturnWithBackButtonText);
+                    drawBlueCenteredText(spriteBatch, ReturnWithBackButtonText);
                     break;
             }
         }
 
-        private void drawRedCenteredText(SpriteBatch spriteBatch, string text)
+        private void drawBlueCenteredText(SpriteBatch spriteBatch, string text)
         {
             spriteBatch.DrawString(font,
                                    text,
                                    new Vector2(screenBounds.Width / 2 - font.MeasureString(text).X / 2,
                                                screenBounds.Height / 2 - font.MeasureString(text).Y / 2),
-                                   Color.Red);
+                                   Astropixx.ThemeColor);
         }
 
-        private void drawRedCenteredText(SpriteBatch spriteBatch, string text1, string text2)
+        private void drawBlueCenteredText(SpriteBatch spriteBatch, string text1, string text2)
         {
             spriteBatch.DrawString(font,
                                    text1,
                                    new Vector2(screenBounds.Width / 2 - font.MeasureString(text1).X / 2,
                                                screenBounds.Height / 2 - font.MeasureString(text1).Y / 2 - 15),
-                                   Color.Red);
+                                   Astropixx.ThemeColor);
 
             spriteBatch.DrawString(font,
                                    text2,
                                    new Vector2(screenBounds.Width / 2 - font.MeasureString(text2).X / 2,
                                                screenBounds.Height / 2 - font.MeasureString(text2).Y / 2 + 15),
-                                   Color.Red);
+                                   Astropixx.ThemeColor);
         }
 
         public void Reset()

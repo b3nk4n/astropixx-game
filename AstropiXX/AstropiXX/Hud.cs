@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using AstropiXX.Extensions;
 
 namespace AstropiXX
 {
@@ -24,7 +25,7 @@ namespace AstropiXX
         private Texture2D texture;
         private SpriteFont font;
 
-        private Vector2 scoreRightLocation = new Vector2(793, 6);
+        private Vector2 scoreLeftLocation = new Vector2(672, -4);
         private Vector2 hitPointLocation = new Vector2(645, 30);
         private Vector2 shieldPointLocation = new Vector2(645, 50);
         private Vector2 overheatLocation = new Vector2(645, 70);
@@ -42,6 +43,10 @@ namespace AstropiXX
         private Vector2 bossHitPointSymbolLocation = new Vector2(325, 38);
 
         Vector2 barOverlayStart = new Vector2(0, 350);
+
+        private int lastLevel = -1;
+        private StringBuilder currentLevelText = new StringBuilder(16);
+        private const string LEVEL_PRE_TEXT = "Level: ";
 
         #endregion
 
@@ -104,20 +109,23 @@ namespace AstropiXX
             if (remainingLives >= 0)
             {
                 drawLevel(spriteBatch);
-                drawOverheat(spriteBatch);
                 drawHitPoints(spriteBatch);
                 drawShieldPoints(spriteBatch);
+
+                if (GameModeManager.SelectedGameMode != GameModeManager.GameMode.Survival)
+                {
+                    drawOverheat(spriteBatch);
+                }
             }       
         }
 
         private void drawScore(SpriteBatch spriteBatch)
         {
-            string scoreText = string.Format("{0:00000000000}", score);
-
-            spriteBatch.DrawString(font,
-                                   scoreText,
-                                   scoreRightLocation - new Vector2(font.MeasureString(scoreText).X, 10),
-                                   Color.White * 0.8f);
+            spriteBatch.DrawInt64WithZeros(font,
+                                  score,
+                                  scoreLeftLocation,
+                                  Color.White * 0.8f,
+                                  11);
         }
 
         private void drawOverheat(SpriteBatch spriteBatch)
@@ -193,7 +201,7 @@ namespace AstropiXX
             spriteBatch.Draw(texture,
                              shieldPointSymbolLocation,
                              shieldPointSymbolSoruce,
-                             Color.Blue * 0.8f);
+                             Astropixx.ThemeColor * 0.8f);
 
             spriteBatch.Draw(texture,
                     new Rectangle(
@@ -206,7 +214,7 @@ namespace AstropiXX
                         (int)barOverlayStart.Y,
                         150,
                         10),
-                    Color.Blue * 0.2f);
+                    Astropixx.ThemeColor * 0.2f);
 
             spriteBatch.Draw(texture,
                     new Rectangle(
@@ -219,15 +227,26 @@ namespace AstropiXX
                         (int)barOverlayStart.Y,
                         (int)(1.5f * shieldPoints),
                         10),
-                    Color.Blue * 0.5f);
+                    Astropixx.ThemeColor * 0.5f);
         }
 
         private void drawLevel(SpriteBatch spriteBatch)
         {
-            string lvlText = "Level: " + level;
+            if (lastLevel != level || currentLevelText.Length == 0)
+            {
+                if (currentLevelText.Length != 0)
+                    currentLevelText.Clear();
+
+                lastLevel = level;
+
+                currentLevelText.Append(LEVEL_PRE_TEXT)
+                                .Append(level);
+            }
+
+
             spriteBatch.DrawString(font,
-                                   lvlText,
-                                   new Vector2(screenBounds.Width / 2 - (font.MeasureString(lvlText).Y / 2),
+                                   currentLevelText,
+                                   new Vector2(screenBounds.Width / 2 - (font.MeasureString(currentLevelText).Y / 2),
                                                5),
                                    Color.White * 0.8f);
         }

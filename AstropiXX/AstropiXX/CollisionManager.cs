@@ -19,6 +19,14 @@ namespace AstropiXX
 
         Random rand = new Random();
 
+        private const string INFO_HEALTH25 = "+25% Repair-Kit";
+        private const string INFO_HEALTH50 = "+50% Repair-Kit";
+        private const string INFO_COOLINGWATER = "Cooling Water";
+        private const string INFO_OVERHEAT = "Overheating Problem!";
+        private const string INFO_SHIELDS = "Activated Shields";
+        private const string INFO_OVERDRIVE = "Overdrive!";
+        private const string INFO_UNDERDRIVE = "Underdrive!";
+
         #endregion
 
         #region Constructors
@@ -75,6 +83,8 @@ namespace AstropiXX
                         
                         rocket.Location = offScreen;
                         asteroid.Location = offScreen;
+
+                        break; // skip other checks, because they are not neccessary
                     }
                 }
             }
@@ -82,9 +92,9 @@ namespace AstropiXX
 
         private void checkPlayerShotToAsteroidCollisions()
         {
-            foreach (var shot in playerManager.PlayerShotManager.Shots)
+            foreach (var asteroid in asteroidManager.Asteroids)
             {
-                foreach (var asteroid in asteroidManager.Asteroids)
+                foreach (var shot in playerManager.PlayerShotManager.Shots)
                 {
                     if (shot.IsCircleColliding(asteroid.Center,
                                                asteroid.CollisionRadius))
@@ -110,6 +120,8 @@ namespace AstropiXX
                             
                             asteroid.Location = offScreen;
                         }
+
+                        break; // skip other checks, because they are not neccessary
                     }
                 }
             }
@@ -162,19 +174,19 @@ namespace AstropiXX
                         case PowerUp.PowerUpType.Health25:
                             playerManager.IncreaseHitPoints(25.0f);
                             SoundManager.PlayRepairSound();
-                            ZoomTextManager.ShowInfo("+25% Repair-Kit");
+                            ZoomTextManager.ShowInfo(INFO_HEALTH25);
                             break;
 
                         case PowerUp.PowerUpType.Health50:
                             playerManager.IncreaseHitPoints(50.0f);
-                            ZoomTextManager.ShowInfo("+50% Repair-Kit");
+                            ZoomTextManager.ShowInfo(INFO_HEALTH50);
                             SoundManager.PlayRepairSound();
                             break;
 
                         case PowerUp.PowerUpType.CoolWater:
                             playerManager.Overheat = 0.0f;
                             SoundManager.PlayCoolWaterSound();
-                            ZoomTextManager.ShowInfo("Cooling Water");
+                            ZoomTextManager.ShowInfo(INFO_COOLINGWATER);
                             break;
 
                         case PowerUp.PowerUpType.LowBonusScore:
@@ -195,25 +207,25 @@ namespace AstropiXX
                         case PowerUp.PowerUpType.OverHeat:
                             playerManager.Overheat = PlayerManager.OVERHEAT_MAX;
                             SoundManager.PlayOverheatSound();
-                            ZoomTextManager.ShowInfo("Overheating Problem!");
+                            ZoomTextManager.ShowInfo(INFO_OVERHEAT);
                             break;
 
                         case PowerUp.PowerUpType.Shield:
                             playerManager.ActivateShield();
                             SoundManager.PlayShieldSound();
-                            ZoomTextManager.ShowInfo("Activated Shields");
+                            ZoomTextManager.ShowInfo(INFO_SHIELDS);
                             break;
 
                         case PowerUp.PowerUpType.Overdrive:
                             playerManager.StartOverdrive();
-                            SoundManager.PlayExtraShipSound();
-                            ZoomTextManager.ShowInfo("Overdrive!");
+                            SoundManager.PlayOverdriveSound();
+                            ZoomTextManager.ShowInfo(INFO_OVERDRIVE);
                             break;
 
                         case PowerUp.PowerUpType.Underdrive:
                             playerManager.StartUnderdrive();
                             SoundManager.PlayOverheatSound();
-                            ZoomTextManager.ShowInfo("Underdrive!");
+                            ZoomTextManager.ShowInfo(INFO_UNDERDRIVE);
                             break;
                     }
 

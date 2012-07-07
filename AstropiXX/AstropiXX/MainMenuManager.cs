@@ -75,6 +75,8 @@ namespace AstropiXX
 
         private MarketplaceSearchTask searchTask = new MarketplaceSearchTask();
 
+        private const string SEARCH_TERM = "Benjamin Sautermeister";
+
         #endregion
 
         #region Constructors
@@ -130,47 +132,47 @@ namespace AstropiXX
             spriteBatch.Draw(texture,
                              astropixxDestination,
                              astropixxSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
 
             spriteBatch.Draw(texture,
                              startDestination,
                              startSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
 
             spriteBatch.Draw(texture,
                              leaderboardsDestination,
                              leaderboardsSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
 
             if (InstructionManager.HasDoneInstructions)
             {
                 spriteBatch.Draw(texture,
                                  instructionsDestination,
                                  instructionsSource,
-                                 Color.Red * opacity);
+                                 Color.White * opacity);
             }
             else
             {
                 spriteBatch.Draw(texture,
                                  instructionsDestination,
                                  instructionsSource,
-                                 Color.Red * opacity * (0.25f + (float)(Math.Pow(Math.Sin(time), 2.0f)) * 0.75f));
+                                 Color.White * opacity * (0.25f + (float)(Math.Pow(Math.Sin(time), 2.0f)) * 0.75f));
             }
 
             spriteBatch.Draw(texture,
                              helpDestination,
                              helpSource,
-                             Color.Red * opacity * 0.9f);
+                             Astropixx.ThemeColor * opacity * 0.9f);
 
             spriteBatch.Draw(texture,
                              settingsDestination,
                              settingsSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
 
             spriteBatch.Draw(texture,
                              moreGamesDestination,
                              moreGamesSource,
-                             Color.Red * opacity * 0.8f);
+                             Astropixx.ThemeColor * opacity * 0.8f);
         }
 
         private void handleTouchInputs()
@@ -203,7 +205,7 @@ namespace AstropiXX
             // Settings
             else if (gameInput.IsPressed(ReviewAction))
             {
-                searchTask.SearchTerms = "Benjamin Sautermeister";
+                searchTask.SearchTerms = SEARCH_TERM;
                 searchTask.Show();
             }
             else

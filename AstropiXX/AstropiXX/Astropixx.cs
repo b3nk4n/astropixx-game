@@ -27,36 +27,40 @@ namespace AstropiXX
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        public static readonly Color ThemeColor = new Color(0, 55, 255);
+
         /// <summary>
         /// Advertising stuff
         /// </summary>
         static AdGameComponent adGameComponent;
         static DrawableAd bannerAd;
 
-        private readonly string HighscoreText = "Personal Highscore!";
-        private readonly string GameOverText = "GAME OVER!";
+        private const string GAMESTATE_DATA_FILE = "state.dat";
 
-        private readonly string KeyboardTitleTextVeryBad = "Are you kidding me???";
-        private readonly string KeyboardTitleTextBad = "Really?!?";
-        private readonly string KeyboardTitleTextVeryLow = "Not bad!";
-        private readonly string KeyboardTitleTextLow = "Well done!";
-        private readonly string KeyboardTitleTextMed = "Congratulation!";
-        private readonly string KeyboardTitleTextHigh = "Nice!";
-        private readonly string KeyboardTitleTextVeryHigh = "Amazing!";
-        private readonly string KeyboardTitleTextUltra = "Awesome!";
-        private readonly string KeyboardTitleTextUltraPlus = "Excellent!";
-        private readonly string KeyboardTitleTextGodlike = "God? Is it you?";
+        private const string HighscoreText = "Personal Highscore!";
+        private const string GameOverText = "GAME OVER!";
 
-        private readonly string KeyboardInLocalMessageFormatText = "You are locally ranked {0}/10!\nPlease enter your name...\n[only: A..Z, a..z, 0..9, 12 characters]";
-        private readonly string KeyboardNotInLocalMessageFormatText = "You are not locally ranked!\nPlease enter your name for online submission...\n[only: A..Z, a..z, 0..9, 12 characters]";
+        private const string KeyboardTitleTextVeryBad = "Are you kidding me???";
+        private const string KeyboardTitleTextBad = "Really?!?";
+        private const string KeyboardTitleTextVeryLow = "Not bad!";
+        private const string KeyboardTitleTextLow = "Well done!";
+        private const string KeyboardTitleTextMed = "Congratulation!";
+        private const string KeyboardTitleTextHigh = "Nice!";
+        private const string KeyboardTitleTextVeryHigh = "Amazing!";
+        private const string KeyboardTitleTextUltra = "Awesome!";
+        private const string KeyboardTitleTextUltraPlus = "Excellent!";
+        private const string KeyboardTitleTextGodlike = "God? Is it you?";
+
+        private const string KeyboardInLocalMessageFormatText = "You are locally ranked {0}/10!\nPlease enter your name...\n[only: A..Z, a..z, 0..9, 12 characters]";
+        private const string KeyboardNotInLocalMessageFormatText = "You are not locally ranked!\nPlease enter your name for online submission...\n[only: A..Z, a..z, 0..9, 12 characters]";
 
         private Random rand = new Random();
 
-        private readonly string ContinueText = "Push to continue...";
+        private const string ContinueText = "Push to continue...";
         private string VersionText;
-        private readonly string MusicByText = "Music by";
-        private readonly string MusicCreatorText = "QBIG";
-        private readonly string CreatorText = "by B. Sautermeister";
+        private const string MusicByText = "Music by";
+        private const string MusicCreatorText = "QBIG";
+        private const string CreatorText = "by B. Sautermeister";
 
         private const string StartText = "Touch to start...";
         private const string StartRightText = "Touch on the right side to start your engine!";
@@ -154,14 +158,14 @@ namespace AstropiXX
 #if DEBUG
             AdGameComponent.Initialize(this, "test_client");
 #else
-            AdGameComponent.Initialize(this, "c6f0c15d-5de5-48e9-99d8-e787a33b7355");
+            AdGameComponent.Initialize(this, "2b3adcc6-f39f-4008-a52d-0acc4df4142d");
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
             System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
 #endif       
 
             adGameComponent = AdGameComponent.Current;
 
-            // Frame rate is 30 fps by default for Windows Phone.
+            // Frame rate is 60 fps by default for Windows Phone.
             TargetElapsedTime = TimeSpan.FromTicks(166667);
 
             InitializaPhoneServices();
@@ -208,7 +212,7 @@ namespace AstropiXX
 #if DEBUG
             bannerAd = adGameComponent.CreateAd("Image480_80", new Rectangle(160, 0, 480, 80));
 #else
-            bannerAd = adGameComponent.CreateAd("82015", new Rectangle(160, 0, 480, 80));
+            bannerAd = adGameComponent.CreateAd("92006", new Rectangle(160, 0, 480, 80));
 #endif       
             bannerAd.BorderEnabled = false;
 
@@ -218,19 +222,19 @@ namespace AstropiXX
 
             starFieldManager1 = new StarFieldManager(this.GraphicsDevice.Viewport.Width,
                                                     this.GraphicsDevice.Viewport.Height,
-                                                    100,
+                                                    75,
                                                     new Vector2(-50.0f, 0),
                                                     spriteSheet,
                                                     new Rectangle(0, 350, 1, 1));
             starFieldManager2 = new StarFieldManager(this.GraphicsDevice.Viewport.Width,
                                                     this.GraphicsDevice.Viewport.Height,
-                                                    70,
+                                                    50,
                                                     new Vector2(-100.0f, 0),
                                                     spriteSheet,
                                                     new Rectangle(0, 350, 2, 2));
             starFieldManager3 = new StarFieldManager(this.GraphicsDevice.Viewport.Width,
                                                     this.GraphicsDevice.Viewport.Height,
-                                                    30,
+                                                    20,
                                                     new Vector2(-150.0f, 0),
                                                     spriteSheet,
                                                     new Rectangle(0, 350, 3, 3));
@@ -392,7 +396,7 @@ namespace AstropiXX
             {
                 // If user choose to save, create a new file
                 using (IsolatedStorageFileStream fileStream
-                    = isolatedStorageFile.CreateFile("state.dat"))
+                    = isolatedStorageFile.CreateFile(GAMESTATE_DATA_FILE))
                 {
                     using (StreamWriter writer = new StreamWriter(fileStream))
                     {
@@ -481,9 +485,9 @@ namespace AstropiXX
             using (IsolatedStorageFile isolatedStorageFile
                     = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                if (isolatedStorageFile.FileExists("state.dat"))
+                if (isolatedStorageFile.FileExists(GAMESTATE_DATA_FILE))
                 {
-                    isolatedStorageFile.DeleteFile("state.dat");
+                    isolatedStorageFile.DeleteFile(GAMESTATE_DATA_FILE);
                 }
             }
         }
@@ -495,11 +499,11 @@ namespace AstropiXX
                 using (IsolatedStorageFile isolatedStorageFile
                     = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    if (isolatedStorageFile.FileExists("state.dat"))
+                    if (isolatedStorageFile.FileExists(GAMESTATE_DATA_FILE))
                     {
                         //If user choose to save, create a new file
                         using (IsolatedStorageFileStream fileStream
-                            = isolatedStorageFile.OpenFile("state.dat", FileMode.Open))
+                            = isolatedStorageFile.OpenFile(GAMESTATE_DATA_FILE, FileMode.Open))
                         {
                             using (StreamReader reader = new StreamReader(fileStream))
                             {
@@ -552,7 +556,7 @@ namespace AstropiXX
                             }
                         }
 
-                        isolatedStorageFile.DeleteFile("state.dat");
+                        isolatedStorageFile.DeleteFile(GAMESTATE_DATA_FILE);
                     }
                 }
             }
@@ -562,6 +566,8 @@ namespace AstropiXX
                 this.resetGame();
                 this.gameState = GameStates.TitleScreen;
             }
+
+            GC.Collect();
         }
 
         /// <summary>
@@ -586,6 +592,8 @@ namespace AstropiXX
             {
                 adGameComponent.Update(gameTime);
             }
+
+            SoundManager.Update(gameTime);
 
             gameInput.BeginUpdate();
 
@@ -690,6 +698,7 @@ namespace AstropiXX
                         gameModeManager.IsActive = false;
 
                         gameState = GameStates.SelectShip;
+                        spaceshipManager.PrepareStrings();
                     }
 
                     break;
@@ -758,10 +767,25 @@ namespace AstropiXX
                     submissionManager.IsActive = true;
                     submissionManager.Update(gameTime);
 
-                    if (submissionManager.ContinueClicked || submissionManager.CancelClicked || backButtonPressed)
+                    if (submissionManager.CancelClicked || backButtonPressed)
                     {
                         submissionManager.IsActive = false;
                         gameState = GameStates.MainMenu;
+                    }
+                    else if (submissionManager.RetryClicked)
+                    {
+                        submissionManager.IsActive = false;
+                        resetGame();
+                        hud.Update(playerManager.GetPlayerResultScore(),
+                                   playerManager.LivesRemaining,
+                                   playerManager.Overheat,
+                                   playerManager.HitPoints,
+                                   playerManager.ShieldPoints,
+                                   levelManager.CurrentLevel);
+
+                        touchedToStart = false;
+                        CurrentStartText = StartText;
+                        gameState = GameStates.Playing;
                     }
 
                     break;
@@ -897,7 +921,7 @@ namespace AstropiXX
 
                         if (playerManager.LivesRemaining < 0)
                         {
-                            levelManager.Reset();
+                            levelManager.ResetLevelTimer();
                             gameState = GameStates.GameOver;
                             zoomTextManager.ShowText(GameOverText);
                         }
@@ -1076,30 +1100,30 @@ namespace AstropiXX
                                        ContinueText,
                                        new Vector2(this.GraphicsDevice.Viewport.Width / 2 - pericles18.MeasureString(ContinueText).X / 2,
                                                    275),
-                                       Color.Red * (0.25f + (float)(Math.Pow(Math.Sin(gameTime.TotalGameTime.TotalSeconds), 2.0f)) * 0.75f));
+                                       Astropixx.ThemeColor * (0.25f + (float)(Math.Pow(Math.Sin(gameTime.TotalGameTime.TotalSeconds), 2.0f)) * 0.75f));
 
                 spriteBatch.DrawString(pericles16,
                                        MusicByText,
                                        new Vector2(this.GraphicsDevice.Viewport.Width / 2 - pericles18.MeasureString(MusicByText).X / 2,
                                                    410),
-                                       Color.Red);
+                                       Astropixx.ThemeColor);
                 spriteBatch.DrawString(pericles16,
                                        MusicCreatorText,
                                        new Vector2(this.GraphicsDevice.Viewport.Width / 2 - pericles18.MeasureString(MusicCreatorText).X / 2,
                                                    435),
-                                       Color.Red);
+                                       Astropixx.ThemeColor);
 
                 spriteBatch.DrawString(pericles16,
                                        VersionText,
                                        new Vector2(this.GraphicsDevice.Viewport.Width - (pericles16.MeasureString(VersionText).X + 15),
                                                    this.GraphicsDevice.Viewport.Height - (pericles16.MeasureString(VersionText).Y + 10)),
-                                       Color.Red);
+                                       Astropixx.ThemeColor);
 
                 spriteBatch.DrawString(pericles16,
                                        CreatorText,
                                        new Vector2(15,
                                                    this.GraphicsDevice.Viewport.Height - (pericles16.MeasureString(CreatorText).Y + 10)),
-                                       Color.Red);
+                                       Astropixx.ThemeColor);
             }
 
             if (gameState == GameStates.MainMenu)
@@ -1142,8 +1166,6 @@ namespace AstropiXX
                 starFieldManager1.Draw(spriteBatch);
                 starFieldManager2.Draw(spriteBatch);
                 starFieldManager3.Draw(spriteBatch);
- 
-                //playerManager.Draw(spriteBatch);
                 
                 instructionManager.Draw(spriteBatch);
                 
@@ -1168,16 +1190,19 @@ namespace AstropiXX
 
             if (gameState == GameStates.Paused)
             {
-                drawBackground(spriteBatch);
+                starFieldManager1.Draw(spriteBatch);
+                starFieldManager2.Draw(spriteBatch);
+                starFieldManager3.Draw(spriteBatch);
 
                 powerUpManager.Draw(spriteBatch);
+
+                asteroidManager.Draw(spriteBatch);  
 
                 playerManager.Draw(spriteBatch);
 
                 EffectManager.Draw(spriteBatch);
 
                 // Pause title
-
                 spriteBatch.Draw(spriteSheet,
                                  new Rectangle(0, 0, 800, 480),
                                  new Rectangle(0, 350, 1, 1),
@@ -1193,21 +1218,25 @@ namespace AstropiXX
                 spriteBatch.Draw(menuSheet,
                                  cancelDestination,
                                  cancelSource,
-                                 Color.Red);
+                                 Color.White);
 
                 spriteBatch.Draw(menuSheet,
                                  continueDestination,
                                  continueSource,
-                                 Color.Red);
+                                 Color.White);
             }
 
             if (gameState == GameStates.Playing ||
                 gameState == GameStates.PlayerDead ||
                 gameState == GameStates.GameOver)
             {
-                drawBackground(spriteBatch);
+                starFieldManager1.Draw(spriteBatch);
+                starFieldManager2.Draw(spriteBatch);
+                starFieldManager3.Draw(spriteBatch);
 
                 powerUpManager.Draw(spriteBatch);
+                
+                asteroidManager.Draw(spriteBatch);        
 
                 playerManager.Draw(spriteBatch);
 
@@ -1223,7 +1252,7 @@ namespace AstropiXX
                                        CurrentStartText,
                                        new Vector2(this.GraphicsDevice.Viewport.Width / 2 - pericles18.MeasureString(CurrentStartText).X / 2,
                                                    240),
-                                       Color.Red * (0.25f + (float)(Math.Pow(Math.Sin(gameTime.TotalGameTime.TotalSeconds), 2.0f)) * 0.75f));
+                                       Astropixx.ThemeColor * (0.25f + (float)(Math.Pow(Math.Sin(gameTime.TotalGameTime.TotalSeconds), 2.0f)) * 0.75f));
                 }
             }
 
@@ -1292,6 +1321,8 @@ namespace AstropiXX
 
             bossDirectKill = true;
             bossBonusScore = InitialBossBonusScore;
+
+            GC.Collect();
         }
 
         private void keyboardCallback(IAsyncResult result)
@@ -1304,14 +1335,14 @@ namespace AstropiXX
             {
                 submissionManager.SetUp(name,
                                         playerManager.GetPlayerResultScore(),
-                                        levelManager.LastLevel);
+                                        levelManager.CurrentLevel);
 
                 highscoreManager.SaveHighScore(name,
                                                playerManager.GetPlayerResultScore(),
                                                playerManager.CollectScore,
                                                playerManager.DistanceScore,
                                                playerManager.DestroyedAsteroids,
-                                               levelManager.LastLevel,
+                                               levelManager.CurrentLevel,
                                                GameModeManager.SelectedGameMode);
             }
             else

@@ -79,6 +79,10 @@ namespace AstropiXX
         public enum GameMode { Survival, Destruction, Combo };
         public static GameMode SelectedGameMode = GameMode.Survival;
 
+        private const string DESCRIPTION_SURVIVAL = "Stay alive! As long as you can!!!";
+        private const string DESCRIPTION_DESTRUCTION = "Destroy the asteroids! As much as you can!!!";
+        private const string DESCRIPTION_COMBO = "Gain the highest score by destroying asteroids and collecting credits!";
+
         public GameModeManager(Texture2D mtex, SpriteFont font,
                                 PlayerManager player, HighscoreManager highscoreManager)
         {
@@ -211,7 +215,7 @@ namespace AstropiXX
             spriteBatch.Draw(menuTexture,
                              ArrowLeftDestination,
                              ArrowRightSource,
-                             Color.Red * opacity,
+                             Astropixx.ThemeColor * opacity,
                              0.0f,
                              Vector2.Zero,
                              SpriteEffects.FlipHorizontally,
@@ -221,7 +225,7 @@ namespace AstropiXX
             spriteBatch.Draw(menuTexture,
                              ArrowRightDestination,
                              ArrowRightSource,
-                             Color.Red * opacity,
+                             Astropixx.ThemeColor * opacity,
                              0.0f,
                              Vector2.Zero,
                              SpriteEffects.None,
@@ -234,13 +238,13 @@ namespace AstropiXX
             spriteBatch.Draw(menuTexture,
                                 goDestination,
                                 goSource,
-                                Color.Red * opacity);
+                                Color.White * opacity);
 
             // Button cancel
             spriteBatch.Draw(menuTexture,
                              cancelDestination,
                              cancelSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
 
 
         }
@@ -254,16 +258,16 @@ namespace AstropiXX
             {
                 case GameMode.Destruction:
                     src = GameModeDestructionSource;
-                    desc = "Destroy the asteroids! As much as you can!!!";
+                    desc = DESCRIPTION_DESTRUCTION;
                     break;
                 case GameMode.Combo:
                     src = GameModeComboSource;
-                    desc = "Gain the highest score by destroying asteroids and collecting credits!";
+                    desc = DESCRIPTION_COMBO;
                     break;
                 
                 default:
                     src = GameModeSurvivalSource;
-                    desc = "Stay alive! As long as you can!!!";
+                    desc = DESCRIPTION_SURVIVAL;
                     break;
             }
 
@@ -280,7 +284,7 @@ namespace AstropiXX
                                 desc,
                                 new Vector2(DescriptionCenter.X - font.MeasureString(desc).X / 2,
                                             DescriptionCenter.Y),
-                                Color.Red * opacity);
+                                Astropixx.ThemeColor * opacity);
             
         }
 

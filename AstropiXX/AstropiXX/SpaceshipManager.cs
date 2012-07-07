@@ -53,7 +53,6 @@ namespace AstropiXX
         public const long CREDITS_TO_UNLOCK_HARD = 5000000;
         public const long ASTEROIDS_TO_UNLOCK_TANK = 1000;
 
-
         private readonly Rectangle ArrowRightSource = new Rectangle(400, 350,
                                                                   100, 100);
         private readonly Rectangle ArrowRightDestination = new Rectangle(550, 175,
@@ -94,6 +93,19 @@ namespace AstropiXX
         private float switchShipTimer = 0.0f;
         private const float SwitchShipMinTimer = 0.25f;
 
+        private const string NAME_GREEN_HORNET = "Green Hornet G1";
+        private const string NAME_EASY = "Light Drone 'Locuz'";
+        private const string NAME_MEDIUM = "Starship S2";
+        private const string NAME_HARD = "Heavy Battleship T21";
+        private const string NAME_SPEEDER = "Speeder Z11";
+        private const string NAME_TANK = "Tankship Rocket X23";
+
+        private string descriptionGreenHornet = null;
+        private string descriptionMedium = null;
+        private string descriptionHard = null;
+        private string descriptionSpeeder = null;
+        private string descriptionTank = null;
+
         public SpaceshipManager(Texture2D mtex, Texture2D spriteSheet, SpriteFont font,
                                 PlayerManager player, HighscoreManager highscoreManager)
         {
@@ -102,6 +114,8 @@ namespace AstropiXX
             this.font = font;
             this.playerManager = player;
             this.highscoreManager = highscoreManager;
+
+            PrepareStrings();
         }
 
         #region Methods
@@ -267,7 +281,7 @@ namespace AstropiXX
             spriteBatch.Draw(menuTexture,
                              ArrowLeftDestination,
                              ArrowRightSource,
-                             Color.Red * opacity,
+                             Astropixx.ThemeColor * opacity,
                              0.0f,
                              Vector2.Zero,
                              SpriteEffects.FlipHorizontally,
@@ -277,7 +291,7 @@ namespace AstropiXX
             spriteBatch.Draw(menuTexture,
                              ArrowRightDestination,
                              ArrowRightSource,
-                             Color.Red * opacity,
+                             Astropixx.ThemeColor * opacity,
                              0.0f,
                              Vector2.Zero,
                              SpriteEffects.None,
@@ -288,20 +302,46 @@ namespace AstropiXX
                 spriteBatch.Draw(menuTexture,
                                  goDestination,
                                  goSource,
-                                 Color.Red * opacity);
+                                 Color.White * opacity);
             else
                 spriteBatch.Draw(menuTexture,
                                  goDestination,
                                  goSource,
-                                 Color.Red * (opacity * 0.5f));
+                                 Color.White * (opacity * 0.5f));
 
             // Button cancel
             spriteBatch.Draw(menuTexture,
                              cancelDestination,
                              cancelSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
 
             
+        }
+
+        /// <summary>
+        /// Prepares the variable strings (called each time navigating to the select spaceship screen).
+        /// </summary>
+        public void PrepareStrings()
+        {
+            descriptionGreenHornet = string.Format("Fly a total distance of {0}ly! [{1}%]",
+                                                   DISTANCE_TO_UNLOCK_GREENHORNET,
+                                                   (int)(100.0f * (highscoreManager.TotalDistanceScore / (float)DISTANCE_TO_UNLOCK_GREENHORNET)));
+
+            descriptionMedium = string.Format("Destroy {0} asteroids in destruction mode! [{1}%]",
+                                              ASTEROIDS_TO_UNLOCK_MEDIUM,
+                                              (int)(100.0f * (highscoreManager.TotalDestroyedAsteroids / (float)ASTEROIDS_TO_UNLOCK_MEDIUM)));
+
+            descriptionHard = string.Format("Collect {0} credits in combo mode! [{1}%]",
+                                            CREDITS_TO_UNLOCK_HARD,
+                                            (int)(100.0f * (highscoreManager.TotalCollectScore / (float)CREDITS_TO_UNLOCK_HARD)));
+
+            descriptionSpeeder = string.Format("Fly a total distance of {0}ly! [{1}%]",
+                                               DISTANCE_TO_UNLOCK_SPEEDER,
+                                               (int)(100.0f * (highscoreManager.TotalDistanceScore / (float)DISTANCE_TO_UNLOCK_SPEEDER)));
+
+            descriptionTank = string.Format("Destroy {0} asteroids in destruction mode! [{1}%]",
+                                            ASTEROIDS_TO_UNLOCK_TANK,
+                                            (int)(100.0f * (highscoreManager.TotalDestroyedAsteroids / (float)ASTEROIDS_TO_UNLOCK_TANK)));
         }
 
         private void drawSpaceship(SpriteBatch spriteBatch)
@@ -314,51 +354,41 @@ namespace AstropiXX
                 case PlayerManager.PlayerType.GreenHornet:
                     src = SpaceshipGreenHornetSource;
                     if (isCurrentSelectionUnlocked())
-                        desc = "Green Hornet G1";
+                        desc = NAME_GREEN_HORNET;
                     else
-                        desc = string.Format("Fly a total distance of {0}ly! [{1}%]",
-                                             DISTANCE_TO_UNLOCK_GREENHORNET,
-                                             (int)(100.0f * (highscoreManager.TotalDistanceScore / (float)DISTANCE_TO_UNLOCK_GREENHORNET)));
+                        desc = descriptionGreenHornet;
                     break;
                 case PlayerManager.PlayerType.Medium:
                     src = SpaceshipMediumSource;
                     if (isCurrentSelectionUnlocked())
-                        desc = "Starship S2";
+                        desc = NAME_MEDIUM;
                     else
-                        desc = string.Format("Destroy {0} asteroids in destruction mode! [{1}%]",
-                                             ASTEROIDS_TO_UNLOCK_MEDIUM,
-                                             (int)(100.0f * (highscoreManager.TotalDestroyedAsteroids / (float)ASTEROIDS_TO_UNLOCK_MEDIUM)));
+                        desc = descriptionMedium;
                     break;
                 case PlayerManager.PlayerType.Hard:
                     src = SpaceshipHardSource;
                     if (isCurrentSelectionUnlocked())
-                        desc = "Heavy Battleship T21";
+                        desc = NAME_HARD;
                     else
-                        desc = string.Format("Collect {0} credits in combo mode! [{1}%]",
-                                             CREDITS_TO_UNLOCK_HARD,
-                                             (int)(100.0f * (highscoreManager.TotalCollectScore / (float)CREDITS_TO_UNLOCK_HARD)));
+                        desc = descriptionHard;
                     break;
                 case PlayerManager.PlayerType.Speeder:
                     src = SpaceshipSpeederSource;
                     if (isCurrentSelectionUnlocked())
-                        desc = "Speeder Z11";
+                        desc = NAME_SPEEDER;
                     else
-                        desc = string.Format("Fly a total distance of {0}ly! [{1}%]",
-                                             DISTANCE_TO_UNLOCK_SPEEDER,
-                                             (int)(100.0f * (highscoreManager.TotalDistanceScore / (float)DISTANCE_TO_UNLOCK_SPEEDER)));
+                        desc = descriptionSpeeder;
                     break;
                 case PlayerManager.PlayerType.Tank:
                     src = SpaceshipTankSource;
                     if (isCurrentSelectionUnlocked())
-                        desc = "Tankship Rocket X23";
+                        desc = NAME_TANK;
                     else
-                        desc = string.Format("Destroy {0} asteroids in destruction mode! [{1}%]",
-                                             ASTEROIDS_TO_UNLOCK_TANK,
-                                             (int)(100.0f * (highscoreManager.TotalDestroyedAsteroids / (float)ASTEROIDS_TO_UNLOCK_TANK)));
+                        desc = descriptionTank;
                     break;
                 default:
                     src = SpaceshipEasySource;
-                    desc = "Light Drone 'Locuz'";
+                    desc = NAME_EASY;
                     break;
             }
 
@@ -388,15 +418,18 @@ namespace AstropiXX
                 spriteBatch.Draw(menuTexture,
                              LockDestination,
                              LockSource,
-                             Color.Red * opacity);
+                             Astropixx.ThemeColor * opacity);
 
             }
 
-            spriteBatch.DrawString(font,
-                                   desc,
-                                   new Vector2(DescriptionCenter.X - font.MeasureString(desc).X / 2,
-                                               DescriptionCenter.Y),
-                                   Color.Red * opacity);
+            if (desc != null)
+            {
+                spriteBatch.DrawString(font,
+                                       desc,
+                                       new Vector2(DescriptionCenter.X - font.MeasureString(desc).X / 2,
+                                                   DescriptionCenter.Y),
+                                       Astropixx.ThemeColor * opacity);
+            }
         }
 
         #endregion

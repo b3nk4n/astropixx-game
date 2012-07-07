@@ -14,11 +14,11 @@ namespace AstropiXX
     {
         #region Members
 
-        private List<Highscore> topScoresAll = new List<Highscore>();
-        private List<Highscore> topScoresMonth = new List<Highscore>();
-        private List<Highscore> topScoresWeek = new List<Highscore>();
-        private List<Highscore> topScoresDay = new List<Highscore>();
-        private List<Highscore> topScoresMostAddictive = new List<Highscore>();
+        private List<Highscore> topScoresAll = new List<Highscore>(16);
+        private List<Highscore> topScoresMonth = new List<Highscore>(16);
+        private List<Highscore> topScoresWeek = new List<Highscore>(16);
+        private List<Highscore> topScoresDay = new List<Highscore>(16);
+        private List<Highscore> topScoresMostAddictive = new List<Highscore>(16);
 
         private int topRankMe;
         private long topScoreMe;
@@ -60,6 +60,27 @@ namespace AstropiXX
         private readonly string gameMode;
         private readonly string fileName;
 
+        private const string PSEUDO_PHONE_ID = "##00000000000000000000000000000000";
+
+        private const string ANID = "ANID";
+        private const string SUBMIT_FORMAT = "http://bsautermeister.de/astropixx/newscore.php?Method={0}&PhoneID={1}&Name={2}&Score={3}&Level={4}&Hash={5}&GameMode={6}";
+        private const string RECEIVE_FORMAT = "http://bsautermeister.de/astropixx/requestscores.php?Method=TOP10PHONE&PhoneID={0}&GameMode={1}";
+
+        private const string XML_TOPLIST = "toplist";
+        private const string XML_RANK = "rank";
+        private const string XML_NAME = "name";
+        private const string XML_SCORE = "score";
+        private const string XML_LEVEL = "level";
+        private const string XML_S_SCORE = "sscore";
+        private const string XML_S_LEVEL = "slevel";
+        private const string XML_PLAYER = "player";
+        private const string XML_ME = "me";
+        private const string XML_ALL = "all";
+        private const string XML_MONTH = "month";
+        private const string XML_WEEK = "week";
+        private const string XML_DAY = "day";
+        private const string XML_ADDICTIVE = "addictive";
+
         #endregion
 
         #region Constructors
@@ -92,16 +113,16 @@ namespace AstropiXX
 
             try
             {
-                phoneid = UserExtendedProperties.GetValue("ANID") as string;
+                phoneid = UserExtendedProperties.GetValue(ANID) as string;
 
                 if (phoneid == null)
                 {
-                    phoneid = "##00000000000000000000000000000000";
+                    phoneid = PSEUDO_PHONE_ID;
                 }
             }
             catch (UnauthorizedAccessException)
             {
-                phoneid = "##00000000000000000000000000000000";
+                phoneid = PSEUDO_PHONE_ID;
             }
 
             phoneid = phoneid.Substring(2, 32);
@@ -131,7 +152,7 @@ namespace AstropiXX
                 else
                     statusText = TEXT_START_SUBMIT;
 
-                wc.DownloadStringAsync(new Uri(string.Format("http://bsautermeister.de/astropixx/newscore.php?Method={0}&PhoneID={1}&Name={2}&Score={3}&Level={4}&Hash={5}&GameMode={6}",
+                wc.DownloadStringAsync(new Uri(string.Format(SUBMIT_FORMAT,
                                                              method, 
                                                              phoneid, 
                                                              name, 
@@ -150,7 +171,7 @@ namespace AstropiXX
             if (!wc.IsBusy)
             {
                 statusText = TEXT_START_REFRESH;
-                wc.DownloadStringAsync(new Uri(string.Format("http://bsautermeister.de/astropixx/requestscores.php?Method=TOP10PHONE&PhoneID={0}&GameMode={1}",
+                wc.DownloadStringAsync(new Uri(string.Format(RECEIVE_FORMAT,
                                                PHONE_ID,
                                                gameMode)));
             }
@@ -174,82 +195,82 @@ namespace AstropiXX
                     topScoresDay.Clear();
                     topScoresMostAddictive.Clear();
 
-                    XElement xmlToplist = xmlDoc.Element("toplist");
+                    XElement xmlToplist = xmlDoc.Element(XML_TOPLIST);
 
                     if (xmlToplist.HasElements)
                     {
-                        XElement xmlMe = xmlToplist.Element("me");
+                        XElement xmlMe = xmlToplist.Element(XML_ME);
 
                         if (xmlMe != null && xmlMe.HasElements)
                         {
-                            topRankMe = Int32.Parse(xmlMe.Element("rank").Value);
-                            topScoreMe = Int64.Parse(xmlMe.Element("score").Value);
-                            topLevelMe = Int32.Parse(xmlMe.Element("level").Value);
-                            totalScoreMe = Int64.Parse(xmlMe.Element("sscore").Value);
-                            totalLevelMe = Int32.Parse(xmlMe.Element("slevel").Value);
+                            topRankMe = Int32.Parse(xmlMe.Element(XML_RANK).Value);
+                            topScoreMe = Int64.Parse(xmlMe.Element(XML_SCORE).Value);
+                            topLevelMe = Int32.Parse(xmlMe.Element(XML_LEVEL).Value);
+                            totalScoreMe = Int64.Parse(xmlMe.Element(XML_S_SCORE).Value);
+                            totalLevelMe = Int32.Parse(xmlMe.Element(XML_S_LEVEL).Value);
                         }
 
-                        XElement xmlAll = xmlToplist.Element("all");
+                        XElement xmlAll = xmlToplist.Element(XML_ALL);
 
                         if (xmlAll != null && xmlAll.HasElements)
                         {
-                            foreach (XElement xmlPlayer in xmlAll.Elements("player"))
+                            foreach (XElement xmlPlayer in xmlAll.Elements(XML_PLAYER))
                             {
-                                string name = xmlPlayer.Element("name").Value;
-                                long score = Int64.Parse(xmlPlayer.Element("score").Value);
-                                int level = Int32.Parse(xmlPlayer.Element("level").Value);
+                                string name = xmlPlayer.Element(XML_NAME).Value;
+                                long score = Int64.Parse(xmlPlayer.Element(XML_SCORE).Value);
+                                int level = Int32.Parse(xmlPlayer.Element(XML_LEVEL).Value);
                                 topScoresAll.Add(new Highscore(name, score, level));
                             }
                         }
 
-                        XElement xmlMonth = xmlToplist.Element("month");
+                        XElement xmlMonth = xmlToplist.Element(XML_MONTH);
 
                         if (xmlMonth != null && xmlMonth.HasElements)
                         {
-                            foreach (XElement xmlPlayer in xmlMonth.Elements("player"))
+                            foreach (XElement xmlPlayer in xmlMonth.Elements(XML_PLAYER))
                             {
-                                string name = xmlPlayer.Element("name").Value;
-                                long score = Int64.Parse(xmlPlayer.Element("score").Value);
-                                int level = Int32.Parse(xmlPlayer.Element("level").Value);
+                                string name = xmlPlayer.Element(XML_NAME).Value;
+                                long score = Int64.Parse(xmlPlayer.Element(XML_SCORE).Value);
+                                int level = Int32.Parse(xmlPlayer.Element(XML_LEVEL).Value);
                                 topScoresMonth.Add(new Highscore(name, score, level));
                             }
                         }
 
-                        XElement xmlWeek = xmlToplist.Element("week");
+                        XElement xmlWeek = xmlToplist.Element(XML_WEEK);
 
                         if (xmlWeek != null && xmlWeek.HasElements)
                         {
-                            foreach (XElement xmlPlayer in xmlWeek.Elements("player"))
+                            foreach (XElement xmlPlayer in xmlWeek.Elements(XML_PLAYER))
                             {
-                                string name = xmlPlayer.Element("name").Value;
-                                long score = Int64.Parse(xmlPlayer.Element("score").Value);
-                                int level = Int32.Parse(xmlPlayer.Element("level").Value);
+                                string name = xmlPlayer.Element(XML_NAME).Value;
+                                long score = Int64.Parse(xmlPlayer.Element(XML_SCORE).Value);
+                                int level = Int32.Parse(xmlPlayer.Element(XML_LEVEL).Value);
                                 topScoresWeek.Add(new Highscore(name, score, level));
                             }
                         }
 
-                        XElement xmlDay = xmlToplist.Element("day");
+                        XElement xmlDay = xmlToplist.Element(XML_DAY);
 
                         if (xmlDay != null && xmlDay.HasElements)
                         {
-                            foreach (XElement xmlPlayer in xmlDay.Elements("player"))
+                            foreach (XElement xmlPlayer in xmlDay.Elements(XML_PLAYER))
                             {
-                                string name = xmlPlayer.Element("name").Value;
-                                long score = Int64.Parse(xmlPlayer.Element("score").Value);
-                                int level = Int32.Parse(xmlPlayer.Element("level").Value);
+                                string name = xmlPlayer.Element(XML_NAME).Value;
+                                long score = Int64.Parse(xmlPlayer.Element(XML_SCORE).Value);
+                                int level = Int32.Parse(xmlPlayer.Element(XML_LEVEL).Value);
                                 topScoresDay.Add(new Highscore(name, score, level));
                             }
                         }
 
-                        XElement xmlMostAddictive = xmlToplist.Element("addictive");
+                        XElement xmlMostAddictive = xmlToplist.Element(XML_ADDICTIVE);
 
                         if (xmlMostAddictive != null && xmlMostAddictive.HasElements)
                         {
-                            foreach (XElement xmlPlayer in xmlMostAddictive.Elements("player"))
+                            foreach (XElement xmlPlayer in xmlMostAddictive.Elements(XML_PLAYER))
                             {
-                                string name = xmlPlayer.Element("name").Value;
-                                long score = Int64.Parse(xmlPlayer.Element("score").Value);
-                                int level = Int32.Parse(xmlPlayer.Element("level").Value);
+                                string name = xmlPlayer.Element(XML_NAME).Value;
+                                long score = Int64.Parse(xmlPlayer.Element(XML_SCORE).Value);
+                                int level = Int32.Parse(xmlPlayer.Element(XML_LEVEL).Value);
                                 topScoresMostAddictive.Add(new Highscore(name, score, level));
                             }
                         }

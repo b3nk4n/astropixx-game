@@ -14,7 +14,7 @@ namespace AstropiXX
 
         public Texture2D Texture;
 
-        protected List<Rectangle> frames = new List<Rectangle>();
+        protected List<Rectangle> frames = new List<Rectangle>(16);
         private int frameWidth;
         private int frameHeight;
         private int currentFrame;

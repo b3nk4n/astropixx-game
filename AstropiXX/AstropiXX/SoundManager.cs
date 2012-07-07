@@ -20,29 +20,14 @@ namespace AstropiXX
         private static int explosionsCount = 4;
 
         private static SoundEffect playerShot;
-        private static SoundEffect enemyShot;
 
         private static SoundEffect coinSound;
         private static SoundEffect repairSound;
         private static SoundEffect coolWaterSound;
         private static SoundEffect extraShipSound;
-        private static SoundEffect extraSpeciaShotSound;
-        private static SoundEffect nukeExplosionSound;
         private static SoundEffect rocketSound;
-        private static SoundEffect scoreMultiSound;
-        private static SoundEffect antiScoreMultiSound;
-        private static SoundEffect bonusRocketSound;
-        private static SoundEffect slowSound;
-        private static SoundEffect outOfControlSound;
         private static SoundEffect overheatSound;
-        private static SoundEffect enemyRocketSound;
         private static SoundEffect shieldSound;
-
-        private static SoundEffect bossEasySound;
-        private static SoundEffect bossMediumSound;
-        private static SoundEffect bossHardSound;
-        private static SoundEffect bossSpeederSound;
-        private static SoundEffect bossTankSound;
 
         private static List<SoundEffect> hitSounds = new List<SoundEffect>();
         private static int hitSoundsCount = 6;
@@ -55,7 +40,14 @@ namespace AstropiXX
         private static Random rand = new Random();
 
         private static Song backgroundSound;
-        //private static SoundEffectInstance backgroundSound;
+
+        // performance improvements
+        public const float MinTimeBetweenHitSound = 0.2f;
+        private static float hitTimer = 0.0f;
+        private static float asteroidHitTimer = 0.0f;
+
+        public const float MinTimeBetweenExplosionSound = 0.1f;
+        private static float explosionTimer = 0.0f;
 
         #endregion
 
@@ -68,29 +60,14 @@ namespace AstropiXX
                 settings = SettingsManager.GetInstance();
 
                 playerShot = content.Load<SoundEffect>(@"Sounds\Shot1");
-                enemyShot = content.Load<SoundEffect>(@"Sounds\Shot2");
 
                 repairSound = content.Load<SoundEffect>(@"Sounds\Repair");
                 coinSound = content.Load<SoundEffect>(@"Sounds\Coin");
                 coolWaterSound = content.Load<SoundEffect>(@"Sounds\CoolWater");
                 extraShipSound = content.Load<SoundEffect>(@"Sounds\Life");
-                extraSpeciaShotSound = content.Load<SoundEffect>(@"Sounds\SpecialShot");
-                nukeExplosionSound = content.Load<SoundEffect>(@"Sounds\Nuke");
                 rocketSound = content.Load<SoundEffect>(@"Sounds\Rocket");
-                scoreMultiSound = content.Load<SoundEffect>(@"Sounds\ScoreMulti");
-                antiScoreMultiSound = content.Load<SoundEffect>(@"Sounds\AntiScoreMulti");
-                bonusRocketSound = content.Load<SoundEffect>(@"Sounds\BonusRockets");
-                slowSound = content.Load<SoundEffect>(@"Sounds\Slow");
-                outOfControlSound = content.Load<SoundEffect>(@"Sounds\OutOfControl");
                 overheatSound = content.Load<SoundEffect>(@"Sounds\Overheat");
-                enemyRocketSound = content.Load<SoundEffect>(@"Sounds\EnemyRocket");
                 shieldSound = content.Load<SoundEffect>(@"Sounds\Shield");
-
-                bossEasySound = content.Load<SoundEffect>(@"Sounds\boss_easy");
-                bossMediumSound = content.Load<SoundEffect>(@"Sounds\boss_medium");
-                bossHardSound = content.Load<SoundEffect>(@"Sounds\boss_hard");
-                bossSpeederSound = content.Load<SoundEffect>(@"Sounds\boss_speeder");
-                bossTankSound = content.Load<SoundEffect>(@"Sounds\boss_tank");
 
                 for (int x = 1; x <= explosionsCount; x++)
                 {
@@ -120,17 +97,31 @@ namespace AstropiXX
             }
         }
 
+        public static void Update(GameTime gameTime)
+        {
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            SoundManager.hitTimer += elapsed;
+            SoundManager.asteroidHitTimer += elapsed;
+            SoundManager.explosionTimer += elapsed;
+        }
+
         public static void PlayExplosion()
         {
-            try
+            if (SoundManager.explosionTimer > SoundManager.MinTimeBetweenExplosionSound)
             {
-                SoundEffectInstance s = explosions[rand.Next(0, explosionsCount)].CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
+                try
+                {
+                    SoundEffectInstance s = explosions[rand.Next(0, explosionsCount)].CreateInstance();
+                    s.Volume = settings.GetSfxValue();
+                    s.Play();
+                }
+                catch
+                {
+                    Debug.WriteLine("SoundManager: Play explosion failed.");
+                }
+
+                SoundManager.explosionTimer = 0.0f;
             }
         }
 
@@ -145,20 +136,6 @@ namespace AstropiXX
             catch
             {
                 Debug.WriteLine("SoundManager: Play player shot failed.");
-            }
-        }
-
-        public static void PlayEnemyShot()
-        {
-            try
-            {
-                SoundEffectInstance s = enemyShot.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play enemy shot failed.");
             }
         }
 
@@ -204,7 +181,7 @@ namespace AstropiXX
             }
         }
 
-        public static void PlayExtraShipSound()
+        public static void PlayOverdriveSound()
         {
             try
             {
@@ -218,59 +195,41 @@ namespace AstropiXX
             }
         }
 
-        public static void PlayExtraSpecialShotSound()
-        {
-            try
-            {
-                SoundEffectInstance s = extraSpeciaShotSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play enemy shot failed.");
-            }
-        }
-
         public static void PlayHitSound()
         {
-            try
+            if (SoundManager.hitTimer > SoundManager.MinTimeBetweenHitSound)
             {
-                SoundEffectInstance s = hitSounds[rand.Next(0, hitSoundsCount)].CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
+                try
+                {
+                    SoundEffectInstance s = hitSounds[rand.Next(0, hitSoundsCount)].CreateInstance();
+                    s.Volume = settings.GetSfxValue();
+                    s.Play();
+                }
+                catch
+                {
+                    Debug.WriteLine("SoundManager: Play explosion failed.");
+                }
+
+                SoundManager.hitTimer = 0.0f;
             }
         }
 
         public static void PlayAsteroidHitSound()
         {
-            try
+            if (SoundManager.asteroidHitTimer > SoundManager.MinTimeBetweenHitSound)
             {
-                SoundEffectInstance s = asteroidHitSounds[rand.Next(0, asteroidHitSoundsCount)].CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
-            }
-        }
+                try
+                {
+                    SoundEffectInstance s = asteroidHitSounds[rand.Next(0, asteroidHitSoundsCount)].CreateInstance();
+                    s.Volume = settings.GetSfxValue();
+                    s.Play();
+                }
+                catch
+                {
+                    Debug.WriteLine("SoundManager: Play explosion failed.");
+                }
 
-        public static void PlayNukeExplosionSound()
-        {
-            try
-            {
-                SoundEffectInstance s = nukeExplosionSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
+                SoundManager.asteroidHitTimer = 0.0f;
             }
         }
 
@@ -279,76 +238,6 @@ namespace AstropiXX
             try
             {
                 SoundEffectInstance s = rocketSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
-            }
-        }
-
-        public static void PlayScoreMultiSound()
-        {
-            try
-            {
-                SoundEffectInstance s = scoreMultiSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
-            }
-        }
-
-        public static void PlayAntiScoreMultiSound()
-        {
-            try
-            {
-                SoundEffectInstance s = antiScoreMultiSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
-            }
-        }
-
-        public static void PlayBonusRocketSound()
-        {
-            try
-            {
-                SoundEffectInstance s = bonusRocketSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
-            }
-        }
-
-        public static void PlayOutOfControlSound()
-        {
-            try
-            {
-                SoundEffectInstance s = outOfControlSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
-            }
-        }
-
-        public static void PlaySlowSound()
-        {
-            try
-            {
-                SoundEffectInstance s = slowSound.CreateInstance();
                 s.Volume = settings.GetSfxValue();
                 s.Play();
             }
@@ -368,21 +257,7 @@ namespace AstropiXX
             }
             catch
             {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
-            }
-        }
-
-        public static void PlayEnemyRocketSound()
-        {
-            try
-            {
-                SoundEffectInstance s = enemyRocketSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play explosion failed.");
+                Debug.WriteLine("SoundManager: Play overhet sound failed.");
             }
         }
 
@@ -397,76 +272,6 @@ namespace AstropiXX
             catch
             {
                 Debug.WriteLine("SoundManager: Play explosion failed.");
-            }
-        }
-
-        public static void PlayBossEasySound()
-        {
-            try
-            {
-                SoundEffectInstance s = bossEasySound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play boss sound failed.");
-            }
-        }
-
-        public static void PlayBossMediumSound()
-        {
-            try
-            {
-                SoundEffectInstance s = bossMediumSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play boss sound failed.");
-            }
-        }
-
-        public static void PlayBossHardSound()
-        {
-            try
-            {
-                SoundEffectInstance s = bossHardSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play boss sound failed.");
-            }
-        }
-
-        public static void PlayBossSpeederSound()
-        {
-            try
-            {
-                SoundEffectInstance s = bossSpeederSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play boss sound failed.");
-            }
-        }
-
-        public static void PlayBossTankSound()
-        {
-            try
-            {
-                SoundEffectInstance s = bossTankSound.CreateInstance();
-                s.Volume = settings.GetSfxValue();
-                s.Play();
-            }
-            catch
-            {
-                Debug.WriteLine("SoundManager: Play boss sound failed.");
             }
         }
 

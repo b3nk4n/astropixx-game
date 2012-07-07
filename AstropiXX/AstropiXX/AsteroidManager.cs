@@ -20,7 +20,7 @@ namespace AstropiXX
         private int asteroidFrames;
         private Texture2D texture;
 
-        private List<Sprite> asteroids = new List<Sprite>();
+        private List<Sprite> asteroids = new List<Sprite>(32);
         private const int INITIAL_MIN_SPEED = 200;
         private int minSpeed = 200;
         private const int MIN_SPEED_OFFSET_PER_LEVEL = 5;
@@ -132,6 +132,7 @@ namespace AstropiXX
                                                               initialFrame.Height)))
                     {
                         locationOK = false;
+                        break;
                     }
                 }
 

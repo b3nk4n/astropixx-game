@@ -17,7 +17,7 @@
     <XnaCrossPlatformGroupID>ad3a7f65-a610-41b0-99ed-3d98c5dafaa5</XnaCrossPlatformGroupID>
     <XnaOutputType>Game</XnaOutputType>
     <XnaRefreshLevel>1</XnaRefreshLevel>
-    <WPTombstoneEnabled>True</WPTombstoneEnabled>
+    <WPTombstoneEnabled>False</WPTombstoneEnabled>
     <XapFilename>$(AssemblyName).xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
     <XnaWindowsPhoneManifestTemplate>Properties\WMAppManifest.xml</XnaWindowsPhoneManifestTemplate>
@@ -73,6 +73,7 @@
     <Compile Include="Astropixx.cs" />
     <Compile Include="CollisionManager.cs" />
     <Compile Include="EffectManager.cs" />
+    <Compile Include="Extensions\SpriteBatchExtensions.cs" />
     <Compile Include="GameModeManager.cs" />
     <Compile Include="HelpManager.cs" />
     <Compile Include="Highscore.cs" />

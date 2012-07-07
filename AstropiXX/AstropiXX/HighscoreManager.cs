@@ -40,6 +40,9 @@ namespace AstropiXX
         private readonly Rectangle GameModeComboDestination = new Rectangle(275, 380,
                                                                         250, 42);
 
+        private readonly Rectangle GameModeTitleDestination = new Rectangle(310, 5,
+                                                                            180, 30);
+
         private readonly Rectangle switcherSource = new Rectangle(400, 350, 
                                                                   100, 100);
         private readonly Rectangle switcherRightDestination = new Rectangle(700, 0,
@@ -74,9 +77,9 @@ namespace AstropiXX
         private long currentHighScoreDestruction;
         private long currentHighScoreCombo;
 
-        private List<Highscore> localTopScoresSurvival = new List<Highscore>();
-        private List<Highscore> localTopScoresDestruction = new List<Highscore>();
-        private List<Highscore> localTopScoresCombo = new List<Highscore>();
+        private List<Highscore> localTopScoresSurvival = new List<Highscore>(16);
+        private List<Highscore> localTopScoresDestruction = new List<Highscore>(16);
+        private List<Highscore> localTopScoresCombo = new List<Highscore>(16);
 
         public const int MaxScores = 10;
 
@@ -109,6 +112,9 @@ namespace AstropiXX
 
         private WebBrowserTask browser;
         private const string BROWSER_URL = "http://bsautermeister.de/astropixx/requestscores.php?Method=TOP100WEB";
+        private const string BROWSER_URL_SURVIVAL = BROWSER_URL + "&GameMode=survival";
+        private const string BROWSER_URL_DESTRUCTION = BROWSER_URL + "&GameMode=destruction";
+        private const string BROWSER_URL_COMBO = BROWSER_URL + "&GameMode=combo";
 
         private const string TEXT_ME = "Your best personal online achievements:";
         private const string TEXT_RANK = "Best Rank:";
@@ -144,15 +150,24 @@ namespace AstropiXX
 
         private const string USERDATA_FILE = "userdata.txt";
 
+        private const string LEADERBOARDNAME_SURVIVAL = "survival";
+        private const string LEADERBOARDNAME_DESTRUCTION = "destruction";
+        private const string LEADERBOARDNAME_COMBO = "combo";
+
+        private const string DOTS3 = ". . . ";
+        private const string DOTS6 = ". . . . . . ";
+        private const string DOTS12 = ". . . . . . . . . . . . ";
+        private const string DOTS21 = ". . . . . . . . . . . . . . . . . . . . . ";
+
         #endregion
 
         #region Constructors
 
         private HighscoreManager()
         {
-            leaderboardManagerSurvival = new LeaderboardManager("survival");
-            leaderboardManagerDestruction = new LeaderboardManager("destruction");
-            leaderboardManagerCombo = new LeaderboardManager("combo");
+            leaderboardManagerSurvival = new LeaderboardManager(LEADERBOARDNAME_SURVIVAL);
+            leaderboardManagerDestruction = new LeaderboardManager(LEADERBOARDNAME_DESTRUCTION);
+            leaderboardManagerCombo = new LeaderboardManager(LEADERBOARDNAME_COMBO);
 
             browser = new WebBrowserTask();
 
@@ -290,11 +305,11 @@ namespace AstropiXX
                     if (scoreState != ScoreState.Local)
                     {
                         if (displayState == HighscoresDisplayState.Survival)
-                            browser.Uri = new Uri(BROWSER_URL + "&GameMode=survival");
+                            browser.Uri = new Uri(BROWSER_URL_SURVIVAL);
                         if (displayState == HighscoresDisplayState.Destruction)
-                            browser.Uri = new Uri(BROWSER_URL + "&GameMode=destruction");
+                            browser.Uri = new Uri(BROWSER_URL_DESTRUCTION);
                         if (displayState == HighscoresDisplayState.Combo)
-                            browser.Uri = new Uri(BROWSER_URL + "&GameMode=combo");
+                            browser.Uri = new Uri(BROWSER_URL_COMBO);
                         browser.Show();
                     }
                 }
@@ -402,14 +417,29 @@ namespace AstropiXX
             {
                 if (displayState == HighscoresDisplayState.Survival)
                 {
+                    spriteBatch.Draw(Texture,
+                                     GameModeTitleDestination,
+                                     GameModeSurvivalSource,
+                                     Color.White * opacity);
+
                     drawLeaderboards(spriteBatch, localTopScoresSurvival, leaderboardManagerSurvival);
                 }
                 else if (displayState == HighscoresDisplayState.Destruction)
                 {
+                    spriteBatch.Draw(Texture,
+                                     GameModeTitleDestination,
+                                     GameModeDestructionSource,
+                                     Color.White * opacity);
+
                     drawLeaderboards(spriteBatch, localTopScoresDestruction, leaderboardManagerDestruction);
                 }
                 else if (displayState == HighscoresDisplayState.Combo)
                 {
+                    spriteBatch.Draw(Texture,
+                                     GameModeTitleDestination,
+                                     GameModeComboSource,
+                                     Color.White * opacity);
+
                     drawLeaderboards(spriteBatch, localTopScoresCombo, leaderboardManagerCombo);
                 }
             }
@@ -420,22 +450,22 @@ namespace AstropiXX
             spriteBatch.Draw(Texture,
                              switcherRightDestination,
                              switcherSource,
-                             Color.Red * opacity);
+                             Astropixx.ThemeColor * opacity);
 
             spriteBatch.Draw(Texture,
                              switcherLeftDestination,
                              switcherSource,
-                             Color.Red * opacity,
+                             Astropixx.ThemeColor * opacity,
                              0.0f,
                              Vector2.Zero,
                              SpriteEffects.FlipHorizontally,
                              0.0f);
 
             spriteBatch.DrawString(Font,
-                                       leaderboardManager.StatusText,
-                                       new Vector2(800 / 2 - Font.MeasureString(leaderboardManager.StatusText).X / 2,
-                                                   440),
-                                       Color.Red * opacity);
+                                   leaderboardManager.StatusText,
+                                   new Vector2(800 / 2 - Font.MeasureString(leaderboardManager.StatusText).X / 2,
+                                               440),
+                                   Astropixx.ThemeColor * opacity);
 
             if (scoreState == ScoreState.Local)
             {
@@ -449,7 +479,7 @@ namespace AstropiXX
                     spriteBatch.Draw(Texture,
                                      resubmitDestination,
                                      resubmitSource,
-                                     Color.Red * opacity);
+                                     Astropixx.ThemeColor * opacity);
                 }
 
                 for (int i = 0; i < MaxScores; i++)
@@ -468,30 +498,30 @@ namespace AstropiXX
                     }
                     else
                     {
-                        scoreText = ". . . . . . . . . . . . ";
-                        nameText = ". . . . . . . . . . . . . . . . . . . . . ";
-                        levelText = ". . . ";
+                        scoreText = DOTS12;
+                        nameText = DOTS21;
+                        levelText = DOTS3;
                     }
 
                     spriteBatch.DrawString(Font,
                            string.Format("{0:d}.", i + 1),
                            new Vector2(50, 100 + (i * 33)),
-                           Color.Red * opacity);
+                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            nameText,
                                            new Vector2(NamePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            scoreText,
                                            new Vector2(ScorePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            levelText,
                                            new Vector2(LevelPositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
                 }
             }
 
@@ -505,12 +535,12 @@ namespace AstropiXX
                 spriteBatch.Draw(Texture,
                                  browserDestination,
                                  browserSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 spriteBatch.Draw(Texture,
                                  refreshDestination,
                                  refreshSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 for (int i = 0; i < MaxScores; i++)
                 {
@@ -528,30 +558,30 @@ namespace AstropiXX
                     }
                     else
                     {
-                        scoreText = ". . . . . . . . . . . . ";
-                        nameText = ". . . . . . . . . . . . . . . . . . . . . ";
-                        levelText = ". . . ";
+                        scoreText = DOTS12;
+                        nameText = DOTS21;
+                        levelText = DOTS3;
                     }
 
                     spriteBatch.DrawString(Font,
                            string.Format("{0:d}.", i + 1),
                            new Vector2(50, 100 + (i * 33)),
-                           Color.Red * opacity);
+                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            nameText,
                                            new Vector2(NamePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            scoreText,
                                            new Vector2(ScorePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            levelText,
                                            new Vector2(LevelPositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
                 }
             }
 
@@ -565,12 +595,12 @@ namespace AstropiXX
                 spriteBatch.Draw(Texture,
                                  browserDestination,
                                  browserSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 spriteBatch.Draw(Texture,
                                  refreshDestination,
                                  refreshSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 for (int i = 0; i < MaxScores; i++)
                 {
@@ -588,30 +618,30 @@ namespace AstropiXX
                     }
                     else
                     {
-                        scoreText = ". . . . . . . . . . . . ";
-                        nameText = ". . . . . . . . . . . . . . . . . . . . . ";
-                        levelText = ". . . ";
+                        scoreText = DOTS12;
+                        nameText = DOTS21;
+                        levelText = DOTS3;
                     }
 
                     spriteBatch.DrawString(Font,
                            string.Format("{0:d}.", i + 1),
                            new Vector2(50, 100 + (i * 33)),
-                           Color.Red * opacity);
+                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            nameText,
                                            new Vector2(NamePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            scoreText,
                                            new Vector2(ScorePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            levelText,
                                            new Vector2(LevelPositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
                 }
             }
 
@@ -625,12 +655,12 @@ namespace AstropiXX
                 spriteBatch.Draw(Texture,
                                  browserDestination,
                                  browserSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 spriteBatch.Draw(Texture,
                                  refreshDestination,
                                  refreshSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 for (int i = 0; i < MaxScores; i++)
                 {
@@ -648,30 +678,30 @@ namespace AstropiXX
                     }
                     else
                     {
-                        scoreText = ". . . . . . . . . . . . ";
-                        nameText = ". . . . . . . . . . . . . . . . . . . . . ";
-                        levelText = ". . . ";
+                        scoreText = DOTS12;
+                        nameText = DOTS21;
+                        levelText = DOTS3;
                     }
 
                     spriteBatch.DrawString(Font,
                            string.Format("{0:d}.", i + 1),
                            new Vector2(50, 100 + (i * 33)),
-                           Color.Red * opacity);
+                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            nameText,
                                            new Vector2(NamePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            scoreText,
                                            new Vector2(ScorePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            levelText,
                                            new Vector2(LevelPositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
                 }
             }
 
@@ -685,12 +715,12 @@ namespace AstropiXX
                 spriteBatch.Draw(Texture,
                                  browserDestination,
                                  browserSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 spriteBatch.Draw(Texture,
                                  refreshDestination,
                                  refreshSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 for (int i = 0; i < MaxScores; i++)
                 {
@@ -708,30 +738,30 @@ namespace AstropiXX
                     }
                     else
                     {
-                        scoreText = ". . . . . . . . . . . . ";
-                        nameText = ". . . . . . . . . . . . . . . . . . . . . ";
-                        levelText = ". . . ";
+                        scoreText = DOTS12;
+                        nameText = DOTS21;
+                        levelText = DOTS3;
                     }
 
                     spriteBatch.DrawString(Font,
                            string.Format("{0:d}.", i + 1),
                            new Vector2(50, 100 + (i * 33)),
-                           Color.Red * opacity);
+                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            nameText,
                                            new Vector2(NamePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            scoreText,
                                            new Vector2(ScorePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            levelText,
                                            new Vector2(LevelPositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
                 }
             }
 
@@ -745,12 +775,12 @@ namespace AstropiXX
                 spriteBatch.Draw(Texture,
                                  browserDestination,
                                  browserSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 spriteBatch.Draw(Texture,
                                  refreshDestination,
                                  refreshSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 for (int i = 0; i < MaxScores; i++)
                 {
@@ -768,30 +798,30 @@ namespace AstropiXX
                     }
                     else
                     {
-                        scoreText = ". . . . . . . . . . . . ";
-                        nameText = ". . . . . . . . . . . . . . . . . . . . . ";
-                        levelText = ". . . . ";
+                        scoreText = DOTS12;
+                        nameText = DOTS21;
+                        levelText = DOTS3;
                     }
 
                     spriteBatch.DrawString(Font,
                            string.Format("{0:d}.", i + 1),
                            new Vector2(50, 100 + (i * 33)),
-                           Color.Red * opacity);
+                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            nameText,
                                            new Vector2(NamePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            scoreText,
                                            new Vector2(ScorePositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
 
                     spriteBatch.DrawString(Font,
                                            levelText,
                                            new Vector2(LevelPositionX, 100 + (i * 33)),
-                                           Color.Red * opacity);
+                                           Astropixx.ThemeColor * opacity);
                 }
             }
 
@@ -805,49 +835,49 @@ namespace AstropiXX
                 spriteBatch.Draw(Texture,
                                  browserDestination,
                                  browserSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 spriteBatch.Draw(Texture,
                                  refreshDestination,
                                  refreshSource,
-                                 Color.Red * opacity);
+                                 Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                    TEXT_ME,
                                    new Vector2(800 / 2 - Font.MeasureString(TEXT_ME).X / 2,
                                                140),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
                 // Title:
                 spriteBatch.DrawString(Font,
                                        TEXT_RANK,
                                        new Vector2(200,
                                                    210),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                        TEXT_SCORE,
                                        new Vector2(200,
                                                    250),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                        TEXT_LEVEL,
                                        new Vector2(200,
                                                    290),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                        TEXT_TOTAL_SCORE,
                                        new Vector2(200,
                                                    330),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                        TEXT_TOTAL_LEVEL,
                                        new Vector2(200,
                                                    370),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
 
                 // Content:
@@ -863,27 +893,27 @@ namespace AstropiXX
                 string totalLevelText;
 
                 if (topRank == 0)
-                    topRankText = ". . . . . . ";
+                    topRankText = DOTS6;
                 else
                     topRankText = string.Format("{0:00000}", leaderboardManager.TopRankMe);
 
                 if (topScore == 0)
-                    topScoreText = ". . . . . . . . . . . . ";
+                    topScoreText = DOTS12;
                 else
                     topScoreText = string.Format("{0:000000000000}", leaderboardManager.TopScoreMe);
 
                 if (topLevel == 0)
-                    topLevelText = ". . . ";
+                    topLevelText = DOTS3;
                 else
                     topLevelText = string.Format("{0:00}", leaderboardManager.TopLevelMe);
 
                 if (totalScore == 0)
-                    totalScoreText = ". . . . . . . . . . . . ";
+                    totalScoreText = DOTS12;
                 else
                     totalScoreText = string.Format("{0:000000000000}", leaderboardManager.TotalScoreMe);
 
                 if (totalLevel == 0)
-                    totalLevelText = ". . . ";
+                    totalLevelText = DOTS3;
                 else
                     totalLevelText = string.Format("{0:00}", leaderboardManager.TotalLevelMe);
 
@@ -891,31 +921,31 @@ namespace AstropiXX
                                        topRankText,
                                        new Vector2(600 - Font.MeasureString(topRankText).X,
                                                    210),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                        topScoreText,
                                        new Vector2(600 - Font.MeasureString(topScoreText).X,
                                                    250),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                        topLevelText,
                                        new Vector2(600 - Font.MeasureString(topLevelText).X,
                                                    290),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                        totalScoreText,
                                        new Vector2(600 - Font.MeasureString(totalScoreText).X,
                                                    330),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
 
                 spriteBatch.DrawString(Font,
                                        totalLevelText,
                                        new Vector2(600 - Font.MeasureString(totalLevelText).X,
                                                    370),
-                                       Color.Red * opacity);
+                                       Astropixx.ThemeColor * opacity);
             }
         }
 
@@ -925,21 +955,21 @@ namespace AstropiXX
             spriteBatch.Draw(Texture,
                              leaderboardsDestination,
                              leaderboardsSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
 
             // Buttons
             spriteBatch.Draw(Texture,
                              GameModeSurvivalDestination,
                              GameModeSurvivalSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
             spriteBatch.Draw(Texture,
                              GameModeDestructionDestination,
                              GameModeDestructionSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
             spriteBatch.Draw(Texture,
                              GameModeComboDestination,
                              GameModeComboSource,
-                             Color.Red * opacity);
+                             Color.White * opacity);
         }
 
         public void SaveHighScore(string name, long resultscore, long collectscore, long distancescore,long asteroids, int level, GameModeManager.GameMode gameMode)
@@ -971,6 +1001,8 @@ namespace AstropiXX
         /// </summary>
         private void saveHighScore(string name, long score, int level, List<Highscore> localTopScores, string fileName)
         {
+            this.lastName = name;
+
             if(this.IsInScoreboard(score,
                                    GameModeManager.SelectedGameMode))
             {
@@ -980,7 +1012,7 @@ namespace AstropiXX
                 this.sortScoreList(localTopScores);
                 this.trimScoreList(localTopScores);
 
-                this.lastName = name;
+                //this.lastName = name;
 
                 using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {

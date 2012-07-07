@@ -93,15 +93,6 @@ namespace AstropiXX
         public new void Activated(StreamReader reader)
         {
             // Sprite
-            //this.location = new Vector2(Single.Parse(reader.ReadLine()),
-            //                            Single.Parse(reader.ReadLine()));
-            //this.Rotation = Single.Parse(reader.ReadLine());
-            //this.TintColor = new Color(Int32.Parse(reader.ReadLine()),
-            //                           Int32.Parse(reader.ReadLine()),
-            //                           Int32.Parse(reader.ReadLine()),
-            //                           Int32.Parse(reader.ReadLine()));
-            //this.velocity = new Vector2(Single.Parse(reader.ReadLine()),
-            //                            Single.Parse(reader.ReadLine()));
             base.Activated(reader);
 
             this.acceleration.X = Single.Parse(reader.ReadLine());
@@ -126,15 +117,6 @@ namespace AstropiXX
         public new void Deactivated(StreamWriter writer)
         {
             // Sprite
-            //writer.WriteLine(location.X);
-            //writer.WriteLine(location.Y);
-            //writer.WriteLine(Rotation);
-            //writer.WriteLine((int)TintColor.R);
-            //writer.WriteLine((int)TintColor.G);
-            //writer.WriteLine((int)TintColor.B);
-            //writer.WriteLine((int)TintColor.A);
-            //writer.WriteLine((int)velocity.X);
-            //writer.WriteLine((int)velocity.Y);
             base.Deactivated(writer);
 
             writer.WriteLine(acceleration.X);

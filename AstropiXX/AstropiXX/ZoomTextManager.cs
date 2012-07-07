@@ -12,11 +12,13 @@ namespace AstropiXX
     {
         #region Members
 
-        private Queue<ZoomText> zoomTexts = new Queue<ZoomText>();
+        private Queue<ZoomText> zoomTexts = new Queue<ZoomText>(8);
         private Vector2 location;
         private SpriteFont font;
 
-        private static Queue<ZoomText> infoTexts = new Queue<ZoomText>();
+        private static readonly Vector2 infoLocation = new Vector2(400, 80);
+
+        private static Queue<ZoomText> infoTexts = new Queue<ZoomText>(8);
 
         #endregion
 
@@ -35,7 +37,7 @@ namespace AstropiXX
         public void ShowText(string text)
         {
             zoomTexts.Enqueue(new ZoomText(text,
-                                           Color.Red,
+                                           Astropixx.ThemeColor,
                                            100,
                                            0.10f));
         }
@@ -91,7 +93,7 @@ namespace AstropiXX
             {
                 spriteBatch.DrawString(font,
                                        info.text,
-                                       new Vector2(400, 80),
+                                       infoLocation,
                                        info.drawColor * (float)(1.0f - Math.Pow(info.Progress, 4.0f)),
                                        0.0f,
                                        new Vector2(font.MeasureString(info.text).X / 2,

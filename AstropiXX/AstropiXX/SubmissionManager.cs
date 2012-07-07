@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using System.IO;
 using AstropiXX.Inputs;
+using AstropiXX.Extensions;
 
 namespace AstropiXX
 {
@@ -26,10 +27,10 @@ namespace AstropiXX
         private readonly Rectangle cancelDestination = new Rectangle(450, 370,
                                                                      300, 50);
 
-        private readonly Rectangle continueSource = new Rectangle(0, 850,
+        private readonly Rectangle retrySource = new Rectangle(0, 1450,
                                                                   300, 50);
-        private readonly Rectangle continueDestination = new Rectangle(250, 370,
-                                                                       300, 50);
+        private readonly Rectangle retryDestination = new Rectangle(50, 370,
+                                                                    300, 50);
 
         private static SubmissionManager submissionManager;
 
@@ -53,7 +54,7 @@ namespace AstropiXX
         private int level;
 
         private bool cancelClicked = false;
-        private bool continueClicked = false;
+        private bool retryClicked = false;
 
 
         private const string TEXT_SUBMIT = "You have now the ability to submit your score!";
@@ -67,7 +68,7 @@ namespace AstropiXX
         public static GameInput GameInput;
         private const string SubmitAction = "Submit";
         private const string CancelAction = "Cancel";
-        private const string ContinueAction = "Continue";
+        private const string RetryAction = "Retry";
 
         #endregion
 
@@ -90,9 +91,9 @@ namespace AstropiXX
             GameInput.AddTouchGestureInput(CancelAction,
                                            GestureType.Tap,
                                            cancelDestination);
-            GameInput.AddTouchGestureInput(ContinueAction,
+            GameInput.AddTouchGestureInput(RetryAction,
                                            GestureType.Tap,
-                                           continueDestination);
+                                           retryDestination);
         }
 
         public static SubmissionManager GetInstance()
@@ -107,10 +108,10 @@ namespace AstropiXX
 
         private void handleTouchInputs()
         {
-            // Submit
-            if (GameInput.IsPressed(SubmitAction))
+            if (submitState == SubmitState.Submit)
             {
-                if (submitState == SubmitState.Submit)
+                // Submit
+                if (GameInput.IsPressed(SubmitAction))
                 {
                     highscoreManager.SubmitScore(LeaderboardManager.SUBMIT,
                                               name,
@@ -120,23 +121,23 @@ namespace AstropiXX
                     submitState = SubmitState.Submitted;
                 }
             }
-            // Cancel
-            if (GameInput.IsPressed(CancelAction))
+            else
             {
-                if (submitState == SubmitState.Submit)
+                // Retry
+                if (GameInput.IsPressed(RetryAction))
                 {
-                    highscoreManager.SetStatusText(GameModeManager.SelectedGameMode,
-                                                   LeaderboardManager.TEXT_NONE);
-                    cancelClicked = true;
+                    if (submitState == SubmitState.Submitted)
+                    {
+                        retryClicked = true;
+                    }
                 }
             }
-            // Cancel
-            if (GameInput.IsPressed(ContinueAction))
+
+            if (GameInput.IsPressed(CancelAction))
             {
-                if (submitState == SubmitState.Submitted)
-                {
-                    cancelClicked = true;
-                }
+                highscoreManager.SetStatusText(GameModeManager.SelectedGameMode,
+                                                   LeaderboardManager.TEXT_NONE);
+                cancelClicked = true;
             }
         }
 
@@ -160,30 +161,30 @@ namespace AstropiXX
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            spriteBatch.Draw(Texture,
+                                 cancelDestination,
+                                 cancelSource,
+                                 Color.White * opacity);
+
             if (submitState == SubmitState.Submit)
             {
                 spriteBatch.Draw(Texture,
                                  submitDestination,
                                  submitSource,
-                                 Color.Red * opacity);
-
-                spriteBatch.Draw(Texture,
-                                 cancelDestination,
-                                 cancelSource,
-                                 Color.Red * opacity);
+                                 Color.White * opacity);
             }
             else if (submitState == SubmitState.Submitted)
             {
                 spriteBatch.Draw(Texture,
-                                 continueDestination,
-                                 continueSource,
-                                 Color.Red * opacity);
+                                 retryDestination,
+                                 retrySource,
+                                 Color.White * opacity);
 
                 spriteBatch.DrawString(Font,
                                    highscoreManager.GetStatusText(GameModeManager.SelectedGameMode),
                                    new Vector2(800 / 2 - Font.MeasureString(highscoreManager.GetStatusText(GameModeManager.SelectedGameMode)).X / 2,
                                                440),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             }
 
@@ -191,45 +192,45 @@ namespace AstropiXX
                                    TEXT_SUBMIT,
                                    new Vector2(800 / 2 - Font.MeasureString(TEXT_SUBMIT).X / 2,
                                                180),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             // Title:
             spriteBatch.DrawString(Font,
                                    TEXT_NAME,
                                    new Vector2(300,
                                                230),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(Font,
                                    TEXT_SCORE,
                                    new Vector2(300,
                                                270),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(Font,
                                    TEXT_LEVEL,
                                    new Vector2(300,
                                                310),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             // Content:
             spriteBatch.DrawString(Font,
                                    name,
                                    new Vector2(450,
                                                230),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
-            spriteBatch.DrawString(Font,
-                                   score.ToString(),
-                                   new Vector2(450,
-                                               270),
-                                   Color.Red * opacity);
+            spriteBatch.DrawInt64(Font,
+                                  score,
+                                  new Vector2(450,
+                                              270),
+                                  Astropixx.ThemeColor * opacity);
 
-            spriteBatch.DrawString(Font,
-                                   level.ToString(),
-                                   new Vector2(450,
-                                               310),
-                                   Color.Red * opacity);
+            spriteBatch.DrawInt64(Font,
+                                  level,
+                                  new Vector2(450,
+                                              310),
+                                  Astropixx.ThemeColor * opacity);
 
 
             spriteBatch.Draw(Texture,
@@ -279,7 +280,7 @@ namespace AstropiXX
                 if (isActive == false)
                 {
                     this.opacity = OpacityMin;
-                    this.continueClicked = false;
+                    this.retryClicked = false;
                     this.cancelClicked = false;
                     this.submitState = SubmitState.Submit;
                 }
@@ -294,11 +295,11 @@ namespace AstropiXX
             }
         }
 
-        public bool ContinueClicked
+        public bool RetryClicked
         {
             get
             {
-                return this.continueClicked;
+                return this.retryClicked;
             }
         }
 

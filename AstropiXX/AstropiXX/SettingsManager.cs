@@ -27,25 +27,25 @@ namespace AstropiXX
         public enum VibrationValues { On, Off };
         public enum ControlPositionValues { Left, Right };
 
-        private readonly string musicTitle = "Music: ";
+        private const string MUSIC_TITLE = "Music: ";
         private SoundValues musicValue = SoundValues.Med;
         private readonly int musicPositionY = 180;
         private readonly Rectangle musicDestination = new Rectangle(250, 175,
                                                                     300, 50);
 
-        private readonly string sfxTitle = "SFX: ";
+        private const string SFX_TITLE = "SFX: ";
         private SoundValues sfxValue = SoundValues.Med;
         private readonly int sfxPositionY = 250;
         private readonly Rectangle sfxDestination = new Rectangle(250, 245,
                                                                   300, 50);
 
-        private readonly string vibrationTitle = "Vibration: ";
+        private const string VIBRATION_TITLE = "Vibration: ";
         private VibrationValues vibrationValue = VibrationValues.On;
         private readonly int vibrationPositionY = 320;
         private readonly Rectangle vibrationDestination = new Rectangle(250, 315,
                                                                         300, 50);
 
-        private readonly string controlPositionTitle = "Control Position: ";
+        private const string CONTROL_POSITION_TITLE = "Control Position: ";
         private ControlPositionValues controlPositionValue = ControlPositionValues.Right;
         private readonly int controlPositionY = 390;
         private readonly Rectangle controlPositionDestination = new Rectangle(250, 385,
@@ -65,6 +65,16 @@ namespace AstropiXX
         private const string SfxAction = "SFX";
         private const string VibrationAction = "Vibration";
         private const string ControlPositionAction = "ControlPos";
+
+        private const string ON = "ON";
+        private const string OFF = "OFF";
+        private const string VERY_LOW = "VERY LOW";
+        private const string LOW = "LOW";
+        private const string MEDIUM = "MEDIUM";
+        private const string HIGH = "HIGH";
+        private const string VERY_HIGH = "VERY HIGH";
+        private const string LEFT = "LEFT";
+        private const string RIGHT = "RIGHT";
 
         #endregion
 
@@ -138,36 +148,6 @@ namespace AstropiXX
 
         private void handleTouchInputs()
         {
-            //if (TouchPanel.IsGestureAvailable)
-            //{
-            //    GestureSample gs = TouchPanel.ReadGesture();
-
-            //    if (gs.GestureType == GestureType.Tap)
-            //    {
-            //        // Music
-            //        if (musicDestination.Contains((int)gs.Position.X, (int)gs.Position.Y))
-            //        {
-            //            toggleMusic();
-            //            Save();
-            //        }
-            //        // Sfx
-            //        else if (sfxDestination.Contains((int)gs.Position.X, (int)gs.Position.Y))
-            //        {
-            //            toggleSfx();
-            //        }
-            //        // Vibration
-            //        else if (vibrationDestination.Contains((int)gs.Position.X, (int)gs.Position.Y))
-            //        {
-            //            toggleVibration();
-            //        }
-            //        // Neutral position
-            //        else if (neutralPositionDestination.Contains((int)gs.Position.X, (int)gs.Position.Y))
-            //        {
-            //            toggleNeutralPosition();
-            //        }
-            //    }
-            //}
-
             // Music
             if (GameInput.IsPressed(MusicAction))
             {
@@ -278,134 +258,134 @@ namespace AstropiXX
 
         private void drawMusic(SpriteBatch spriteBatch)
         {
-            string text = string.Empty;
+            string text;
 
             switch (musicValue)
             {
-                case SoundValues.Off:
-                    text = "OFF";
-                    break;
                 case SoundValues.VeryLow:
-                    text = "VERY LOW";
+                    text = VERY_LOW;
                     break;
                 case SoundValues.Low:
-                    text = "LOW";
+                    text = LOW;
                     break;
                 case SoundValues.Med:
-                    text = "MEDIUM";
+                    text = MEDIUM;
                     break;
                 case SoundValues.High:
-                    text = "HIGH";
+                    text = HIGH;
                     break;
                 case SoundValues.VeryHigh:
-                    text = "VERY HIGH";
+                    text = VERY_HIGH;
+                    break;
+                default:
+                    text = OFF;
                     break;
             }
 
             spriteBatch.DrawString(font,
-                                   musicTitle,
+                                   MUSIC_TITLE,
                                    new Vector2(250,
                                                musicPositionY),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(font,
                                    text,
                                    new Vector2((550 - font.MeasureString(text).X),
                                                musicPositionY),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
         }
 
         private void drawSfx(SpriteBatch spriteBatch)
         {
-            string text = string.Empty;
+            string text;
 
             switch (sfxValue)
             {
-                case SoundValues.Off:
-                    text = "OFF";
-                    break;
                 case SoundValues.VeryLow:
-                    text = "VERY LOW";
+                    text = VERY_LOW;
                     break;
                 case SoundValues.Low:
-                    text = "LOW";
+                    text = LOW;
                     break;
                 case SoundValues.Med:
-                    text = "MEDIUM";
+                    text = MEDIUM;
                     break;
                 case SoundValues.High:
-                    text = "HIGH";
+                    text = HIGH;
                     break;
                 case SoundValues.VeryHigh:
-                    text = "VERY HIGH";
+                    text = VERY_HIGH;
+                    break;
+                default:
+                    text = OFF;
                     break;
             }
 
             spriteBatch.DrawString(font,
-                                   sfxTitle,
+                                   SFX_TITLE,
                                    new Vector2(250,
                                                sfxPositionY),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(font,
                                    text,
                                    new Vector2((550 - font.MeasureString(text).X),
                                                sfxPositionY),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
         }
 
         private void drawVibration(SpriteBatch spriteBatch)
         {
-            string text = string.Empty;
+            string text;
 
             switch (vibrationValue)
             {
                 case VibrationValues.On:
-                    text = "ON";
+                    text = ON;
                     break;
-                case VibrationValues.Off:
-                    text = "OFF";
+                default:
+                    text = OFF;
                     break;
             }
 
             spriteBatch.DrawString(font,
-                                   vibrationTitle,
+                                   VIBRATION_TITLE,
                                    new Vector2(250,
                                                vibrationPositionY),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(font,
                                    text,
                                    new Vector2((550 - font.MeasureString(text).X),
                                                vibrationPositionY),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
         }
 
         private void drawControlPosition(SpriteBatch spriteBatch)
         {
-            string text = string.Empty;
+            string text;
 
             switch (controlPositionValue)
             {
                 case ControlPositionValues.Left:
-                    text = "LEFT";
+                    text = LEFT;
                     break;
-                case ControlPositionValues.Right:
-                    text = "RIGHT";
+                default:
+                    text = RIGHT;
                     break;
             }
 
             spriteBatch.DrawString(font,
-                                   controlPositionTitle,
+                                   CONTROL_POSITION_TITLE,
                                    new Vector2(250,
                                                controlPositionY),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
 
             spriteBatch.DrawString(font,
                                    text,
                                    new Vector2((550 - font.MeasureString(text).X),
                                                controlPositionY),
-                                   Color.Red * opacity);
+                                   Astropixx.ThemeColor * opacity);
         }
 
         #endregion
