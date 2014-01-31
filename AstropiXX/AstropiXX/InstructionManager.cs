@@ -30,7 +30,7 @@ namespace AstropiXX
             Combo,
             PowerUps, 
             GoodLuck, 
-            ReturnWithBackButton};
+            Finished};
 
         private InstructionStates state = InstructionStates.Welcome;
 
@@ -47,6 +47,8 @@ namespace AstropiXX
         private const float DestructionLimit = 32.0f;
         private const float ComboLimit = 35.0f;
         private const float PowerUpsLimit = 38.0f;
+        private const float GoodLuckLimit = 41.0f;
+        private const float FinishedLimit = 44.0f;
 
         private SpriteFont font;
 
@@ -90,8 +92,15 @@ namespace AstropiXX
         private readonly string PowerUpsText = "Gather powerups ... but avoid the red ones!";
         private readonly string GoodLuckText = "Good luck commander!";
         private readonly string ReturnWithBackButtonText = "Press BACK to return...";
+        private readonly string ContinueWithBackButtonText = "Press BACK to start the game...";
 
-        private static bool hasDoneInstructions = false;
+        private bool hasDoneInstructions = false;
+
+        private const string INSTRUCTION_FILE = "instructions.txt";
+
+        private bool isInvalidated = false;
+
+        private bool isAutostarted;
 
         #endregion
 
@@ -129,12 +138,10 @@ namespace AstropiXX
 
             if (playerManager.IsDestroyed)
             {
-                this.state = InstructionStates.ReturnWithBackButton;
+                this.state = InstructionStates.Finished;
 
                 asteroidManager.Update(gameTime);
                 powerUpManager.Update(gameTime);
-
-                return;
             }
             else if (progressTimer < WelcomeLimit)
             {
@@ -219,9 +226,17 @@ namespace AstropiXX
                 asteroidManager.Update(gameTime);
                 powerUpManager.Update(gameTime);
             }
-            else
+            else if (progressTimer < GoodLuckLimit)
             {
                 this.state = InstructionStates.GoodLuck;
+
+                playerManager.Update(gameTime);
+                asteroidManager.Update(gameTime);
+                powerUpManager.Update(gameTime);
+            }
+            else
+            {
+                this.state = InstructionStates.Finished;
 
                 playerManager.Update(gameTime);
                 asteroidManager.Update(gameTime);
@@ -382,11 +397,15 @@ namespace AstropiXX
                     drawBlueCenteredText(spriteBatch, GoodLuckText);
                     break;
 
-                case InstructionStates.ReturnWithBackButton:
+                case InstructionStates.Finished:
                     powerUpManager.Draw(spriteBatch);
                     asteroidManager.Draw(spriteBatch);
+                    playerManager.Draw(spriteBatch);
 
-                    drawBlueCenteredText(spriteBatch, ReturnWithBackButtonText);
+                    if (isAutostarted)
+                        drawBlueCenteredText(spriteBatch, ContinueWithBackButtonText);
+                    else
+                        drawBlueCenteredText(spriteBatch, ReturnWithBackButtonText);
                     break;
             }
         }
@@ -421,14 +440,26 @@ namespace AstropiXX
             this.state = InstructionStates.Welcome;
             GameModeManager.SetupForInstructions();
             playerManager.SelectPlayerType(PlayerManager.PlayerType.Easy);
+            this.isAutostarted = false;
+        }
+
+        public void InstructionsDone()
+        {
+            if (!hasDoneInstructions)
+            {
+                hasDoneInstructions = true;
+                isInvalidated = true;
+            }
         }
 
         public void SaveHasDoneInstructions()
         {
+            if (!isInvalidated)
+                return;
 
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream("instructions.txt", FileMode.Create, isf))
+                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(INSTRUCTION_FILE, FileMode.Create, isf))
                 {
                     using (StreamWriter sw = new StreamWriter(isfs))
                     {
@@ -445,10 +476,12 @@ namespace AstropiXX
         {
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                bool hasExisted = isf.FileExists(@"instructions.txt");
+                bool hasExisted = isf.FileExists(INSTRUCTION_FILE);
 
-                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(@"instructions.txt", FileMode.OpenOrCreate, FileAccess.ReadWrite, isf))
+                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(INSTRUCTION_FILE, FileMode.OpenOrCreate, FileAccess.ReadWrite, isf))
                 {
+                    isInvalidated = false;
+
                     if (hasExisted)
                     {
                         using (StreamReader sr = new StreamReader(isfs))
@@ -477,19 +510,23 @@ namespace AstropiXX
         {
             this.progressTimer = Single.Parse(reader.ReadLine());
             hasDoneInstructions = Boolean.Parse(reader.ReadLine());
+            this.isInvalidated = Boolean.Parse(reader.ReadLine());
+            this.isAutostarted = Boolean.Parse(reader.ReadLine());
         }
 
         public void Deactivated(StreamWriter writer)
         {
             writer.WriteLine(progressTimer);
             writer.WriteLine(hasDoneInstructions);
+            writer.WriteLine(isInvalidated);
+            writer.WriteLine(isAutostarted);
         }
 
         #endregion
 
         #region Properties
 
-        public static bool HasDoneInstructions
+        public bool HasDoneInstructions
         {
             get
             {
@@ -498,6 +535,26 @@ namespace AstropiXX
             set
             {
                 hasDoneInstructions = value;
+            }
+        }
+
+        public bool IsAutostarted
+        {
+            set
+            {
+                this.isAutostarted = value;
+            }
+            get
+            {
+                return this.isAutostarted;
+            }
+        }
+
+        public bool EnougthInstructionsDone
+        {
+            get
+            {
+                return (progressTimer > 5.0f);
             }
         }
 

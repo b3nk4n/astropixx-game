@@ -118,7 +118,7 @@ namespace AstropiXX
         {
             // Texts
             int textsCount = Int32.Parse(reader.ReadLine());
-
+            zoomTexts.Clear();
             for (int i = 0; i < textsCount; ++i)
             {
                 ZoomText text = new ZoomText();
@@ -128,7 +128,7 @@ namespace AstropiXX
 
             // Infos
             int infosCount = Int32.Parse(reader.ReadLine());
-
+            infoTexts.Clear();
             for (int i = 0; i < infosCount; ++i)
             {
                 ZoomText info = new ZoomText();

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2009/deployment" AppPlatformVersion="7.1">
-  <App xmlns="" ProductID="{257c64bd-eb7a-4743-9b20-91e37e1bceea}" Title="AstropiXX" RuntimeType="XNA" Version="1.0.0.0" Genre="Apps.Games" Author="Benjamin Sautermeister" Description="Fun and addicting space game" Publisher="Benjamin Sautermeister">
+  <App xmlns="" ProductID="{257c64bd-eb7a-4743-9b20-91e37e1bceea}" Title="AstropiXX" RuntimeType="XNA" Version="1.6.0.0" Genre="Apps.Games" Author="Benjamin Sautermeister" Description="Fun and addicting space game" Publisher="Benjamin Sautermeister">
     <IconPath IsRelative="true" IsResource="false"></IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />

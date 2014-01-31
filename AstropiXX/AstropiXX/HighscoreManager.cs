@@ -210,10 +210,10 @@ namespace AstropiXX
 
             GameInput.AddTouchSlideInput(GoLeftAction,
                                          Input.Direction.Right,
-                                         50.0f);
+                                         40.0f);
             GameInput.AddTouchSlideInput(GoRightAction,
                                          Input.Direction.Left,
-                                         50.0f);
+                                         40.0f);
         }
 
         public static HighscoreManager GetInstance()
@@ -239,14 +239,17 @@ namespace AstropiXX
                 if (GameInput.IsPressed(SurvivalAction))
                 {
                     ChangeDisplayState(HighscoresDisplayState.Survival);
+                    leaderboardManagerSurvival.Receive();
                 }
                 else if (GameInput.IsPressed(DestructionAction))
                 {
                     ChangeDisplayState(HighscoresDisplayState.Destruction);
+                    leaderboardManagerDestruction.Receive();
                 }
                 else if (GameInput.IsPressed(ComboAction))
                 {
                     ChangeDisplayState(HighscoresDisplayState.Combo);
+                    leaderboardManagerCombo.Receive();
                 }
             }
             else

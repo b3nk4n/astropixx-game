@@ -26,7 +26,7 @@ namespace AstropiXX
 
         private const string Email = "apps@bsautermeister.de";
         private const string EmailSubject = "AstropiXX - Support";
-        private const string Blog = "bsautermeister.de/blog";
+        private const string Blog = "bsautermeister.de";
         private const string MusicSponsor = "Music sponsor:";
         private const string QBig = "soundcloud.com/qbig";
 
@@ -40,7 +40,7 @@ namespace AstropiXX
         private bool isActive = false;
 
         private WebBrowserTask browser;
-        private const string BLOG_URL = "http://bsautermeister.de/blog";
+        private const string BLOG_URL = "http://bsautermeister.de";
         private const string QBIG_URL = "http://soundcloud.com/qbig";
 
         private readonly Rectangle EmailDestination = new Rectangle(250,300,

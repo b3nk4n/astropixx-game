@@ -16,6 +16,8 @@ using System.IO;
 using AstropiXX.Inputs;
 using Microsoft.Advertising.Mobile.Xna;
 using Microsoft.Phone.Info;
+using AdDuplex.Xna;
+using AstropiXX.Nokia;
 
 namespace AstropiXX
 {
@@ -34,6 +36,8 @@ namespace AstropiXX
         /// </summary>
         static AdGameComponent adGameComponent;
         static DrawableAd bannerAd;
+        private AdManager dpManager;
+        private bool isAdDuplexActive = false;
 
         private const string GAMESTATE_DATA_FILE = "state.dat";
 
@@ -67,7 +71,7 @@ namespace AstropiXX
         private const string StartLeftText = "Touch on the left side to start your engine!";
         private string CurrentStartText = StartText;
 
-        enum GameStates { TitleScreen, MainMenu, Highscores, Inscructions, Help, Settings, Playing, Paused, PlayerDead, GameOver, Leaderboards, Submittion,
+        enum GameStates { TitleScreen, MainMenu, Highscores, Instructions, Help, Settings, Playing, Paused, PlayerDead, GameOver, Leaderboards, Submittion,
                           SelectShip, SelectMode };
         GameStates gameState = GameStates.TitleScreen;
         GameStates stateBeforePaused;
@@ -196,6 +200,8 @@ namespace AstropiXX
 
             loadVersion();
 
+            FeedbackHelper.Default.Initialise();
+
             base.Initialize();
         }
 
@@ -215,6 +221,7 @@ namespace AstropiXX
             bannerAd = adGameComponent.CreateAd("92006", new Rectangle(160, 0, 480, 80));
 #endif       
             bannerAd.BorderEnabled = false;
+            bannerAd.ErrorOccurred += bannerAd_ErrorOccurred;
 
             spriteSheet = Content.Load<Texture2D>(@"Textures\SpriteSheet");
             menuSheet = Content.Load<Texture2D>(@"Textures\MenuSheet");
@@ -340,6 +347,16 @@ namespace AstropiXX
             GameModeManager.GameInput = gameInput;
 
             setupInputs();
+
+            // ad duplex
+            dpManager = new AdManager(this, "62387");
+            dpManager.LoadContent();
+        }
+
+        void bannerAd_ErrorOccurred(object sender, Microsoft.Advertising.AdErrorEventArgs e)
+        {
+            // If loading of banner is failed, load an ad duplex banner.
+            isAdDuplexActive = true;
         }
 
         private void setupInputs()
@@ -449,7 +466,7 @@ namespace AstropiXX
 
             if (gameState == GameStates.Playing
                 || gameState == GameStates.PlayerDead
-                || gameState == GameStates.Inscructions)
+                || gameState == GameStates.Instructions)
             {
                 stateBeforePaused = gameState;
                 gameState = GameStates.Paused;
@@ -474,6 +491,10 @@ namespace AstropiXX
         /// </summary>
         void GameActivated(object sender, ActivatedEventArgs e)
         {
+            // no data reaload if resumed from dormant state
+            if (e.IsApplicationInstancePreserved)
+                return;
+
             tryLoadGame();
         }
 
@@ -590,7 +611,10 @@ namespace AstropiXX
                 gameState == GameStates.SelectMode ||
                 (gameState == GameStates.Highscores && highscoreManager.IsSelectionState))
             {
-                adGameComponent.Update(gameTime);
+                if (isAdDuplexActive)
+                    dpManager.Update(gameTime);
+                else
+                    adGameComponent.Update(gameTime);
             }
 
             SoundManager.Update(gameTime);
@@ -652,13 +676,14 @@ namespace AstropiXX
                         case MainMenuManager.MenuItems.Instructions:
                             resetGame();
                             instructionManager.Reset();
+                            instructionManager.IsAutostarted = false;
                             hud.Update(playerManager.GetPlayerResultScore(),
                                        playerManager.LivesRemaining,
                                        playerManager.Overheat,
                                        playerManager.HitPoints,
                                        playerManager.ShieldPoints,
                                        levelManager.CurrentLevel);
-                            gameState = GameStates.Inscructions;
+                            gameState = GameStates.Instructions;
                             break;
 
                         case MainMenuManager.MenuItems.Help:
@@ -733,7 +758,17 @@ namespace AstropiXX
 
                         touchedToStart = false;
                         CurrentStartText = StartText;
-                        gameState = GameStates.Playing;
+
+                        if (instructionManager.HasDoneInstructions)
+                        {
+                            gameState = GameStates.Playing;
+                        }
+                        else
+                        {
+                            instructionManager.Reset();
+                            instructionManager.IsAutostarted = true;
+                            gameState = GameStates.Instructions;
+                        }
                     }
 
                     break;
@@ -790,26 +825,44 @@ namespace AstropiXX
 
                     break;
 
-                case GameStates.Inscructions:
+                case GameStates.Instructions:
 
                     starFieldManager1.Update(gameTime);
                     starFieldManager2.Update(gameTime);
                     starFieldManager3.Update(gameTime);
 
+                    levelManager.SetLevel(1);
+
                     instructionManager.Update(gameTime);
-                    collisionManager.Update();
                     EffectManager.Update(gameTime);
-                    hud.Update(playerManager.GetPlayerResultScore(),
-                               playerManager.LivesRemaining, 
-                               playerManager.Overheat, 
-                               playerManager.HitPoints,
-                               playerManager.ShieldPoints,
-                               levelManager.CurrentLevel);
+                    collisionManager.Update();
+
+                    zoomTextManager.Update();
 
                     if (backButtonPressed)
                     {
-                        InstructionManager.HasDoneInstructions = true;
-                        gameState = GameStates.MainMenu;
+                        if (!instructionManager.HasDoneInstructions && instructionManager.EnougthInstructionsDone)
+                        {
+                            instructionManager.InstructionsDone();
+                            instructionManager.SaveHasDoneInstructions();
+                        }
+
+                        EffectManager.Reset();
+                        if (instructionManager.IsAutostarted)
+                        {
+                            resetGame();
+                            hud.Update(playerManager.GetPlayerResultScore(),
+                               playerManager.LivesRemaining,
+                               playerManager.Overheat,
+                               playerManager.HitPoints,
+                               playerManager.ShieldPoints,
+                               levelManager.CurrentLevel);
+                            gameState = GameStates.Playing;
+                        }
+                        else
+                        {
+                            gameState = GameStates.MainMenu;
+                        }
                     }
 
                     break;
@@ -1161,7 +1214,7 @@ namespace AstropiXX
                 submissionManager.Draw(spriteBatch);
             }
 
-            if (gameState == GameStates.Inscructions)
+            if (gameState == GameStates.Instructions)
             {
                 starFieldManager1.Draw(spriteBatch);
                 starFieldManager2.Draw(spriteBatch);
@@ -1267,10 +1320,26 @@ namespace AstropiXX
                 gameState == GameStates.SelectMode ||
                 (gameState == GameStates.Highscores && highscoreManager.IsSelectionState))
             {
-                adGameComponent.Draw(gameTime);
+                if (!isAdDuplexActive)
+                    adGameComponent.Draw(gameTime);
             }
 
             spriteBatch.End();
+
+            // AdDuplex (must be AFTER End())
+            if (gameState == GameStates.Help ||
+                gameState == GameStates.MainMenu ||
+                gameState == GameStates.Paused ||
+                gameState == GameStates.Settings ||
+                gameState == GameStates.TitleScreen ||
+                gameState == GameStates.Submittion ||
+                gameState == GameStates.SelectShip ||
+                gameState == GameStates.SelectMode ||
+                (gameState == GameStates.Highscores && highscoreManager.IsSelectionState))
+            {
+                if (isAdDuplexActive)
+                    dpManager.Draw(spriteBatch, new Vector2(160, 0));
+            }
 
             base.Draw(gameTime);
         }
